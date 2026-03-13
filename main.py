@@ -217,6 +217,9 @@ def main():
     
     # Generate energy summary (last 7 days)
     visualizer.plot_energy_summary(preprocessor.df, num_days=7)
+
+    # Generate comprehensive benchmark comparison chart
+    visualizer.plot_comprehensive_method_comparison()
     
     # ===================== COMPLETE =====================
     print("\n" + "="*60)
@@ -227,6 +230,7 @@ def main():
     print("   • predicted_vs_actual.png")
     print("   • dashboard_*.png")
     print("   • energy_summary.png")
+    print("   • comprehensive_comparison_all_methods.png")
     print("\n>> Saved model in 'saved_model/' folder:")
     print("   • cnn_energy_model.h5")
     print("   • scaler.pkl")

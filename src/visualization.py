@@ -263,3 +263,97 @@ class Visualizer:
             print(f">> Energy summary saved to '{filepath}'")
         
         plt.show()
+
+    def plot_comprehensive_method_comparison(self, save=True):
+        """
+        Plot accuracy and error-rate comparison across traditional, ML, and CNN methods.
+
+        Args:
+            save: Whether to save the plot
+        """
+        methods = [
+            'EWMA', 'WCMA', 'Pro-\nEnergy', 'Mod\nPro-Energy',
+            'EENA\n(NARNET)', 'PADC-MAC\n(NARNET)', 'Your CNN\n(Final)'
+        ]
+
+        # Accuracy (%) values: low/mid/high ranges used for error bars.
+        accuracy_mid = [10, 15, 16, 20, 99.62, 88.5, 90]
+        accuracy_low = [5, 10, 7, 11, 99.62, 88, 88]
+        accuracy_high = [15, 20, 25, 29, 99.62, 89, 92]
+
+        colors = ['#FF6B6B', '#FFA500', '#FFD93D', '#6BCB77', '#4D96FF', '#9D4EDD', '#00D9FF']
+
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+
+        # Subplot 1: Accuracy Comparison
+        x_pos = np.arange(len(methods))
+        bars = ax1.bar(
+            x_pos, accuracy_mid, color=colors, alpha=0.8,
+            edgecolor='black', linewidth=1.5
+        )
+
+        errors_low = [acc_mid - acc_low for acc_mid, acc_low in zip(accuracy_mid, accuracy_low)]
+        errors_high = [acc_high - acc_mid for acc_mid, acc_high in zip(accuracy_mid, accuracy_high)]
+        ax1.errorbar(
+            x_pos, accuracy_mid, yerr=[errors_low, errors_high], fmt='none',
+            ecolor='black', capsize=5, capthick=2
+        )
+
+        for bar, acc in zip(bars, accuracy_mid):
+            height = bar.get_height()
+            ax1.text(
+                bar.get_x() + bar.get_width() / 2.0, height + 2,
+                f'{acc:.1f}%', ha='center', va='bottom', fontsize=11, fontweight='bold'
+            )
+
+        ax1.set_ylabel('Prediction Accuracy (%)', fontsize=14, fontweight='bold')
+        ax1.set_xlabel('Prediction Method', fontsize=14, fontweight='bold')
+        ax1.set_title('Accuracy Comparison: Traditional vs ML vs Your CNN', fontsize=16, fontweight='bold')
+        ax1.set_xticks(x_pos)
+        ax1.set_xticklabels(methods, fontsize=11)
+        ax1.set_ylim(0, 110)
+        ax1.grid(axis='y', alpha=0.3, linestyle='--')
+        ax1.axhline(y=50, color='red', linestyle='--', linewidth=2, alpha=0.5, label='Minimum Acceptable (50%)')
+        ax1.axhline(y=90, color='green', linestyle='--', linewidth=2, alpha=0.5, label='Excellence Threshold (90%)')
+        ax1.legend(fontsize=10)
+
+        for i in [4, 5, 6]:
+            bars[i].set_edgecolor('gold')
+            bars[i].set_linewidth(3)
+
+        # Subplot 2: Error Rate Comparison (lower is better)
+        error_rates = [90, 85, 84, 80, 0.38, 11.5, 10]
+        bars2 = ax2.bar(
+            x_pos, error_rates, color=colors, alpha=0.8,
+            edgecolor='black', linewidth=1.5
+        )
+
+        for bar, err in zip(bars2, error_rates):
+            height = bar.get_height()
+            label = f'{err:.1f}%' if err > 1 else f'{err:.2f}%'
+            ax2.text(
+                bar.get_x() + bar.get_width() / 2.0, height + 2,
+                label, ha='center', va='bottom', fontsize=11, fontweight='bold'
+            )
+
+        ax2.set_ylabel('Error Rate (%) - Lower is Better', fontsize=14, fontweight='bold')
+        ax2.set_xlabel('Prediction Method', fontsize=14, fontweight='bold')
+        ax2.set_title('Error Rate Comparison (Inverted Scale)', fontsize=16, fontweight='bold')
+        ax2.set_xticks(x_pos)
+        ax2.set_xticklabels(methods, fontsize=11)
+        ax2.set_ylim(0, 100)
+        ax2.grid(axis='y', alpha=0.3, linestyle='--')
+        ax2.invert_yaxis()
+
+        for i in [4, 5, 6]:
+            bars2[i].set_edgecolor('gold')
+            bars2[i].set_linewidth(3)
+
+        plt.tight_layout()
+
+        if save:
+            filepath = os.path.join(OUTPUT_DIR, 'comprehensive_comparison_all_methods.png')
+            plt.savefig(filepath, dpi=FIGURE_DPI, bbox_inches='tight')
+            print(f">> Comprehensive comparison graph saved to '{filepath}'")
+
+        plt.show()
