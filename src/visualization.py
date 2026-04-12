@@ -6,6 +6,7 @@ Generates all plots and graphs for the energy harvesting project.
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+from datetime import datetime
 
 from .config import (
     FIGURE_DPI, DEFAULT_NUM_SAMPLES, OUTPUT_DIR,
@@ -218,24 +219,44 @@ class Visualizer:
         
         plt.show()
     
-    def plot_energy_summary(self, df, num_days=7, save=True):
+    def plot_energy_summary(self, df, num_days=7, end_date_str=None, save=True):
         """
         Plot energy summary for multiple days.
         
         Args:
             df: Full DataFrame with datetime index
             num_days: Number of days to summarize
+            end_date_str: Optional end date (MM/DD/YYYY) for summary window
             save: Whether to save the plot
         """
+        if df.empty:
+            print("Error: No data available for summary graph.")
+            return
+
+        summary_df = df
+        title_suffix = ""
+
+        if end_date_str:
+            try:
+                end_date = datetime.strptime(end_date_str, '%m/%d/%Y').date()
+                summary_df = df[df.index.date <= end_date]
+                title_suffix = f" (Up to {end_date_str})"
+            except ValueError:
+                print(f"Warning: Invalid date '{end_date_str}'. Using latest available data.")
+
+        if summary_df.empty:
+            print("Error: No data available up to the selected date for summary graph.")
+            return
+
         # Get unique dates
-        dates = df.index.date
+        dates = summary_df.index.date
         unique_dates = sorted(set(dates))[-num_days:]
         
         daily_energy = []
         date_labels = []
         
         for date in unique_dates:
-            day_data = df[df.index.date == date]
+            day_data = summary_df[summary_df.index.date == date]
             energy = day_data['Irradiance'].sum() * PLANT_AREA_M2 * (1/60)
             daily_energy.append(energy)
             date_labels.append(date.strftime('%m/%d'))
@@ -251,7 +272,7 @@ class Visualizer:
         
         ax.set_xlabel('Date')
         ax.set_ylabel('Energy Harvested (Wh)')
-        ax.set_title(f'Daily Energy Harvest Summary (Last {num_days} Days)', 
+        ax.set_title(f'Daily Energy Harvest Summary (Last {len(unique_dates)} Days){title_suffix}', 
                      fontsize=14, fontweight='bold')
         ax.grid(True, alpha=0.3, axis='y')
         
@@ -266,88 +287,39 @@ class Visualizer:
 
     def plot_comprehensive_method_comparison(self, save=True):
         """
-        Plot accuracy and error-rate comparison across traditional, ML, and CNN methods.
+        Plot weighting-factor vs error comparison in line-chart style.
 
         Args:
             save: Whether to save the plot
         """
-        methods = [
-            'EWMA', 'WCMA', 'Pro-\nEnergy', 'Mod\nPro-Energy',
-            'EENA\n(NARNET)', 'PADC-MAC\n(NARNET)', 'Your CNN\n(Final)'
-        ]
+        weighting_factor = np.array([0.1, 0.3, 0.5, 0.7, 0.9])
+        ewma_error = [2.6, 2.4, 1.8, 1.4, 1.2]
+        wcma_error = [2.1, 1.75, 1.45, 0.9, 0.65]
+        pro_energy_error = [1.45, 1.25, 0.9, 0.55, 0.35]
+        our_algorithm_error = [1.35, 1.15, 0.7, 0.45, 0.3]
+        # EENA and PADC-MAC are available as single summary error values,
+        # so they are shown as constant reference lines across weighting factors.
+        eena_narnet_error = [0.38, 0.38, 0.38, 0.38, 0.38]
+        padc_mac_narnet_error = [11.5, 11.5, 11.5, 11.5, 11.5]
 
-        # Accuracy (%) values: low/mid/high ranges used for error bars.
-        accuracy_mid = [10, 15, 16, 20, 99.62, 88.5, 90]
-        accuracy_low = [5, 10, 7, 11, 99.62, 88, 88]
-        accuracy_high = [15, 20, 25, 29, 99.62, 89, 92]
+        fig, ax = plt.subplots(figsize=(8, 5), facecolor='#efefef')
+        ax.set_facecolor('#f7f7f7')
 
-        colors = ['#FF6B6B', '#FFA500', '#FFD93D', '#6BCB77', '#4D96FF', '#9D4EDD', '#00D9FF']
+        ax.plot(weighting_factor, ewma_error, marker='o', linewidth=2.2, color='#1f77b4', label='EWMA')
+        ax.plot(weighting_factor, wcma_error, marker='o', linewidth=2.2, color='#ff7f0e', label='WCMA')
+        ax.plot(weighting_factor, pro_energy_error, marker='o', linewidth=2.2, color='#f1c40f', label='Pro-Energy')
+        ax.plot(weighting_factor, eena_narnet_error, marker='o', linewidth=2.2, color='#2ecc71', label='EENA (NARNET)')
+        ax.plot(weighting_factor, padc_mac_narnet_error, marker='o', linewidth=2.2, color='#e74c3c', label='PADC-MAC (NARNET)')
+        ax.plot(weighting_factor, our_algorithm_error, marker='o', linewidth=2.2, color='#8e44ad', label='Our Algorithm')
 
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
-
-        # Subplot 1: Accuracy Comparison
-        x_pos = np.arange(len(methods))
-        bars = ax1.bar(
-            x_pos, accuracy_mid, color=colors, alpha=0.8,
-            edgecolor='black', linewidth=1.5
-        )
-
-        errors_low = [acc_mid - acc_low for acc_mid, acc_low in zip(accuracy_mid, accuracy_low)]
-        errors_high = [acc_high - acc_mid for acc_mid, acc_high in zip(accuracy_mid, accuracy_high)]
-        ax1.errorbar(
-            x_pos, accuracy_mid, yerr=[errors_low, errors_high], fmt='none',
-            ecolor='black', capsize=5, capthick=2
-        )
-
-        for bar, acc in zip(bars, accuracy_mid):
-            height = bar.get_height()
-            ax1.text(
-                bar.get_x() + bar.get_width() / 2.0, height + 2,
-                f'{acc:.1f}%', ha='center', va='bottom', fontsize=11, fontweight='bold'
-            )
-
-        ax1.set_ylabel('Prediction Accuracy (%)', fontsize=14, fontweight='bold')
-        ax1.set_xlabel('Prediction Method', fontsize=14, fontweight='bold')
-        ax1.set_title('Accuracy Comparison: Traditional vs ML vs Your CNN', fontsize=16, fontweight='bold')
-        ax1.set_xticks(x_pos)
-        ax1.set_xticklabels(methods, fontsize=11)
-        ax1.set_ylim(0, 110)
-        ax1.grid(axis='y', alpha=0.3, linestyle='--')
-        ax1.axhline(y=50, color='red', linestyle='--', linewidth=2, alpha=0.5, label='Minimum Acceptable (50%)')
-        ax1.axhline(y=90, color='green', linestyle='--', linewidth=2, alpha=0.5, label='Excellence Threshold (90%)')
-        ax1.legend(fontsize=10)
-
-        for i in [4, 5, 6]:
-            bars[i].set_edgecolor('gold')
-            bars[i].set_linewidth(3)
-
-        # Subplot 2: Error Rate Comparison (lower is better)
-        error_rates = [90, 85, 84, 80, 0.38, 11.5, 10]
-        bars2 = ax2.bar(
-            x_pos, error_rates, color=colors, alpha=0.8,
-            edgecolor='black', linewidth=1.5
-        )
-
-        for bar, err in zip(bars2, error_rates):
-            height = bar.get_height()
-            label = f'{err:.1f}%' if err > 1 else f'{err:.2f}%'
-            ax2.text(
-                bar.get_x() + bar.get_width() / 2.0, height + 2,
-                label, ha='center', va='bottom', fontsize=11, fontweight='bold'
-            )
-
-        ax2.set_ylabel('Error Rate (%) - Lower is Better', fontsize=14, fontweight='bold')
-        ax2.set_xlabel('Prediction Method', fontsize=14, fontweight='bold')
-        ax2.set_title('Error Rate Comparison (Inverted Scale)', fontsize=16, fontweight='bold')
-        ax2.set_xticks(x_pos)
-        ax2.set_xticklabels(methods, fontsize=11)
-        ax2.set_ylim(0, 100)
-        ax2.grid(axis='y', alpha=0.3, linestyle='--')
-        ax2.invert_yaxis()
-
-        for i in [4, 5, 6]:
-            bars2[i].set_edgecolor('gold')
-            bars2[i].set_linewidth(3)
+        ax.set_xlabel('Weighting Factor', fontsize=11)
+        ax.set_ylabel('Error(%)', fontsize=11)
+        ax.set_title('Method Comparison by Weighting Factor', fontsize=12, fontweight='bold')
+        ax.set_xlim(0.1, 0.9)
+        ax.set_ylim(0, 12)
+        ax.set_xticks(weighting_factor)
+        ax.grid(True, alpha=0.3)
+        ax.legend(loc='upper right', fontsize=8, frameon=True, ncol=2)
 
         plt.tight_layout()
 

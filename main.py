@@ -215,11 +215,12 @@ def main():
     ].copy()
     visualizer.plot_daily_dashboard(day_df, TEST_DATE)
     
-    # Generate energy summary (last 7 days)
-    visualizer.plot_energy_summary(preprocessor.df, num_days=7)
+    # Generate energy summary (last 7 days up to selected date)
+    visualizer.plot_energy_summary(preprocessor.df, num_days=7, end_date_str=TEST_DATE)
 
     # Generate comprehensive benchmark comparison chart
     visualizer.plot_comprehensive_method_comparison()
+
     
     # ===================== COMPLETE =====================
     print("\n" + "="*60)

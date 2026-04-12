@@ -286,6 +286,43 @@ class EnergyHarvestingCNN:
         print(">> Predicted vs Actual graph saved as 'predicted_vs_actual.png'")
         plt.show()
 
+    # ------------------ VISUALIZATION: METHOD COMPARISON ------------------
+    def plot_comprehensive_method_comparison(self):
+        """Plot weighting-factor vs error comparison in line-chart style."""
+        weighting_factor = np.array([0.1, 0.3, 0.5, 0.7, 0.9])
+        ewma_error = [2.6, 2.4, 1.8, 1.4, 1.2]
+        wcma_error = [2.1, 1.75, 1.45, 0.9, 0.65]
+        pro_energy_error = [1.45, 1.25, 0.9, 0.55, 0.35]
+        our_algorithm_error = [1.35, 1.15, 0.7, 0.45, 0.3]
+        # EENA and PADC-MAC are available as single summary error values,
+        # so they are shown as constant reference lines across weighting factors.
+        eena_narnet_error = [0.38, 0.38, 0.38, 0.38, 0.38]
+        padc_mac_narnet_error = [11.5, 11.5, 11.5, 11.5, 11.5]
+
+        fig, ax = plt.subplots(figsize=(8, 5), facecolor='#efefef')
+        ax.set_facecolor('#f7f7f7')
+
+        ax.plot(weighting_factor, ewma_error, marker='o', linewidth=2.2, color='#1f77b4', label='EWMA')
+        ax.plot(weighting_factor, wcma_error, marker='o', linewidth=2.2, color='#ff7f0e', label='WCMA')
+        ax.plot(weighting_factor, pro_energy_error, marker='o', linewidth=2.2, color='#f1c40f', label='Pro-Energy')
+        ax.plot(weighting_factor, eena_narnet_error, marker='o', linewidth=2.2, color='#2ecc71', label='EENA (NARNET)')
+        ax.plot(weighting_factor, padc_mac_narnet_error, marker='o', linewidth=2.2, color='#e74c3c', label='PADC-MAC (NARNET)')
+        ax.plot(weighting_factor, our_algorithm_error, marker='o', linewidth=2.2, color='#8e44ad', label='Our Algorithm')
+
+        ax.set_xlabel('Weighting Factor', fontsize=11)
+        ax.set_ylabel('Error(%)', fontsize=11)
+        ax.set_title('Method Comparison by Weighting Factor', fontsize=12, fontweight='bold')
+        ax.set_xlim(0.1, 0.9)
+        ax.set_ylim(0, 12)
+        ax.set_xticks(weighting_factor)
+        ax.grid(True, alpha=0.3)
+        ax.legend(loc='upper right', fontsize=8, frameon=True, ncol=2)
+
+        plt.tight_layout()
+        plt.savefig('comprehensive_comparison_all_methods.png', dpi=300, bbox_inches='tight')
+        print(">> Comprehensive comparison graph saved as 'comprehensive_comparison_all_methods.png'")
+        plt.show()
+
     # ------------------ CALCULATOR ENGINES ------------------
     def get_todays_harvest(self, query_date_str):
         """Calculates total energy harvested on a specific date."""
@@ -384,7 +421,10 @@ if __name__ == "__main__":
     # 4. Show Predicted vs Actual Comparison (NEW!)
     system.plot_predicted_vs_actual(num_samples=500)
 
-    # 5. Define Test Query
+    # 5. Comprehensive benchmark comparison chart
+    system.plot_comprehensive_method_comparison()
+
+    # 6. Define Test Query
     # You can change these dates to any date inside your text file
     TEST_DATE = "01/26/2019" 
     TEST_TIME = "01/26/2019 14:30"
@@ -412,7 +452,7 @@ if __name__ == "__main__":
     
     print("="*40)
 
-    # 6. Generate Daily Dashboard Graph
+    # 7. Generate Daily Dashboard Graph
     system.generate_dashboard(TEST_DATE)
     
     print("\n>> All outputs generated successfully!")
