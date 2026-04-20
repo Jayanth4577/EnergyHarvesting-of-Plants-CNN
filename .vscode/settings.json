@@ -1,0 +1,50 @@
+{
+  "latex-workshop.latex.tools": [
+    {
+      "name": "pdflatex-miktex",
+      "command": "C:/Users/jayan/AppData/Local/Programs/MiKTeX/miktex/bin/x64/pdflatex.exe",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "-output-directory=%OUTDIR%",
+        "%DOC%"
+      ]
+    },
+    {
+      "name": "bibtex-miktex",
+      "command": "C:/Users/jayan/AppData/Local/Programs/MiKTeX/miktex/bin/x64/bibtex.exe",
+      "args": [
+        "%DOC%"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "pdflatex*2 (MiKTeX)",
+      "tools": [
+        "pdflatex-miktex",
+        "pdflatex-miktex",
+        "pdflatex-miktex"
+      ]
+    },
+    {
+      "name": "pdflatex (MiKTeX)",
+      "tools": [
+        "pdflatex-miktex"
+      ]
+    },
+    {
+      "name": "pdflatex -> bibtex -> pdflatex*2 (MiKTeX)",
+      "tools": [
+        "pdflatex-miktex",
+        "bibtex-miktex",
+        "pdflatex-miktex",
+        "pdflatex-miktex"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipe.default": "first",
+  "latex-workshop.view.pdf.viewer": "tab",
+  "latex-workshop.latex.autoBuild.run": "onSave"
+}
