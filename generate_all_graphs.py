@@ -128,7 +128,7 @@ def graph_3_energy_dashboard():
         600 * np.sin(np.pi * (hours - 6) / 12) * (1 + 0.1 * np.random.randn(len(hours))),
         0,
     )
-    irradiance = np.clip(irradiance, 0, 600)
+    irradiance = np.clip(irradiance, 0, None)
 
     panel_area = 0.05
     efficiency = 0.20

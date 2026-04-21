@@ -13,14 +13,26 @@
 \usepackage{multirow}
 \usepackage{booktabs}
 \usepackage{array}
+\usepackage{placeins}
 
 % Correct hyphenation
 \hyphenation{op-tical net-works semi-conduc-tor}
 
+% Float placement tuning to keep figures/tables close to related text
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.8}
+\DeclareUnicodeCharacter{2248}{\ensuremath{\approx}}
+\DeclareUnicodeCharacter{2212}{-}
+
 \begin{document}
 
 % Paper title
-\title{CNN-Based Solar Energy Harvesting of Plants}
+\title{CNN-Based Solar Energy Harvesting }
 
 % Author names
 \author{E~Jayanth%
@@ -344,11 +356,12 @@ Proposed solution architecture takes as input a sequence of 60 steps window with
 \subsection{CNN Architecture}
 Network architecture details are listed in Table~\ref{table:architecture}.
 
-\begin{table*}[!t]
+\begin{table}[!htbp]
 \caption{CNN Architecture for Solar Energy Prediction}
 \label{table:architecture}
 \centering
 \small
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{|l|l|l|}
 \hline
 \textbf{Layer} & \textbf{Configuration} & \textbf{Output Shape} \\
@@ -376,22 +389,32 @@ Output & Dense(1) + ReLU & (1) \\
 \hline
 \multicolumn{3}{|l|}{\textbf{Total Parameters:} $\approx$3.1K} \\
 \hline
-\end{tabular}
-\end{table*}
+\end{tabular}%
+}
+\end{table}
 
 \subsection{Key Innovations}
 
 \subsubsection{Weighted Loss Function}
-To increase reliability of prediction under low irradiance conditions, weighted MSE loss function was selected.
+To increase the reliability under low irradiance and reduce the sensitivity to outlier spikes, a weighted Huber loss was selected.
 \begin{equation}
-\mathcal{L}_{weighted} = \frac{1}{N}\sum_{i=1}^{N} w_i \cdot (y_i - \hat{y}_i)^2
+\mathcal{L}_{weighted} = \frac{1}{N}\sum_{i=1}^{N} w_i \cdot h_{\delta}(y_i - \hat{y}_i)
 \end{equation}
 
 where weights are:
 \begin{equation}
 w_i = \begin{cases}
-2.0 & \text{if } y_i < 30 \text{ W/m}^2 \\
+2.0 & \text{if } y_i < 0.05\;\text{(normalized the low-light threshold)} \\
 1.0 & \text{otherwise}
+\end{cases}
+\end{equation}
+
+and the Huber term is:
+\begin{equation}
+h_{\delta}(e)=
+\begin{cases}
+\frac{1}{2}e^2, & |e|<\delta \\
+\delta\left(|e|-\frac{1}{2}\delta\right), & |e|\ge\delta
 \end{cases}
 \end{equation}
 
@@ -418,14 +441,14 @@ As shown in the ablation study, this component contributes a measurable MAE redu
 \caption{CNN Training for Solar Prediction}
 \label{alg:training}
 \begin{algorithmic}[1]
-\STATE \textbf{Input:} Training images $\mathcal{I}_{train}$, irradiance labels
+\STATE \textbf{Input:} Training sequences $\mathcal{X}_{train}$, Irradiance labels
 $Y_{train}$
 \STATE \textbf{Output:} Trained CNN model $\theta^*$
 \STATE
 \STATE Initialize CNN parameters $\theta$ randomly
-\STATE Set hyperparameters: $lr=0.001$, $batch\_size=32$, $epochs=15$
+\STATE Set hyperparameters: $lr=0.0002$, $batch\_size=64$, $epochs\le100$
 \STATE
-\FOR{epoch = 1 to 15}
+\FOR{epoch = 1 to 100}
     \FOR{each batch $(X_b, Y_b)$ in training set}
         \STATE Forward pass: $\hat{Y}_b = CNN(X_b; \theta)$
         \STATE Compute weighted loss: $\mathcal{L} = \mathcal{L}_{weighted}(Y_b,
@@ -435,7 +458,7 @@ $Y_{train}$
     \ENDFOR
     \STATE
     \STATE Validate on validation set
-    \IF{validation loss increases for 3 consecutive epochs}
+  \IF{validation loss does not improve for 10 consecutive epochs}
         \STATE \textbf{break} (early stopping)
     \ENDIF
 \ENDFOR
@@ -451,14 +474,15 @@ At deployment, the system operates as Algorithm~\ref{alg:inference}.
 \caption{Real-Time Energy Prediction}
 \label{alg:inference}
 \begin{algorithmic}[1]
-\STATE \textbf{Input:} Current image $I_{current}$, trained model $\theta^*$
+\STATE \textbf{Input:} Latest sequence window $X_t\in\mathbb{R}^{60\times2}$, trained model $\theta^*$
 \STATE \textbf{Output:} Predicted irradiance $\hat{I}$, power management decision
 \STATE
-\STATE Capture image from camera/sensor
-\STATE Preprocess: Resize to $224 \times 224$, normalize
-\STATE Forward pass: $\hat{I} = CNN(I_{current}; \theta^*)$
-\STATE Apply bias correction: $\hat{I} \leftarrow \hat{I} - 6.12$ (optional)
+\STATE Build input from the recent irradiance and the first-derivative features
+\STATE Normalize features and then reshape to $(1,60,2)$
+\STATE Forward pass: $\hat{I} = CNN(X_t; \theta^*)$
+\STATE Apply bias correction: $\hat{I} \leftarrow \hat{I} + b$
 \STATE Clip to valid range: $\hat{I} \leftarrow \max(0, \min(1200, \hat{I}))$
+\STATE If local time is outside the daylight hours, set $\hat{I}\leftarrow0$
 \STATE
 \STATE Calculate expected harvest: $E_{harvest} = \eta \cdot A \cdot \hat{I} \cdot
 \Delta t$
@@ -473,7 +497,7 @@ At deployment, the system operates as Algorithm~\ref{alg:inference}.
 \end{algorithm}
 
 \subsection{Computational Complexity}
-\textbf{Training:} Complexity is $O(P \cdot B \cdot F)$, where $P$ is parameter count ($\approx$2M), $B$ is batch size (32), and $F$ is per-layer FLOPs. In our setup, end-to-end training takes about two hours on GPU.
+\textbf{Training:} Complexity is $O(P \cdot B \cdot F)$, where $P$ is parameter count ($\approx$3.1K), $B$ is batch size (64), and $F$ is per-layer FLOPs.
 
 \textbf{Inference:} Runtime is $O(F)$ and approximately 50~ms on CPU, which is suitable for minute-level prediction updates. With INT8 quantization, inference time decreases to about 15~ms with less than 2\% accuracy reduction.
 
@@ -541,11 +565,12 @@ Model development followed a three-iteration process, where each iteration addre
 \end{itemize}
 
 \textbf{Performance Summary:}
-\begin{table*}[!t]
+\begin{table}[!htbp]
 \caption{Model Iteration Comparison}
 \label{table:iterations}
 \centering
 \small
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{|l|c|c|c|}
 \hline
 \textbf{Metric} & \textbf{Iter 1} & \textbf{Iter 2} & \textbf{Iter 3} \\
@@ -557,24 +582,28 @@ Error Distribution & Skewed & Gaussian & \textbf{Best Gaussian Fit} \\
 Catastrophic Fails & Many & Few & \textbf{0} \\
 Production Ready & No & Almost & \textbf{Yes} \\
 \hline
-\end{tabular}
-\end{table*}
+\end{tabular}%
+}
+\end{table}
 
-\begin{figure*}[!t]
+\begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{iteration_comparison.png}
+\includegraphics[width=\columnwidth]{iteration_comparison.png}
 \caption{Three-iteration model comparison.}
 \label{fig:iteration_comparison}
-\end{figure*}
+\end{figure}
+
+\FloatBarrier
 
 \subsection{Comparison with various State-of-the-Art Methods}
 Table~\ref{table:comparison} shows the comparison of the proposed model against selected statistical and ML-based approaches. Major takeaways are summarized as follows:
 
-\begin{table*}[!t]
+\begin{table}[!htbp]
 \caption{Comprehensive Comparison with State-of-the-Art Methods}
 \label{table:comparison}
 \centering
 \small
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{|l|c|c|c|}
 \hline
 \textbf{Method} & \textbf{Approach} & \textbf{Accuracy} & \textbf{Year} \\
@@ -595,19 +624,20 @@ PADC-MAC (NARNET) \cite{ref11} & ML (NARNET) & 71-89\%$^\dagger$ & 2023 \\
 \hline
 \textbf{Our CNN Model} & \textbf{Deep Learning} & \textbf{88-92\%} & \textbf{2026} \\
 \hline
-\multicolumn{4}{|p{0.95\textwidth}|}{$^*$EENA: Limited evaluation scope, may not generalize.} \\
-\multicolumn{4}{|p{0.95\textwidth}|}{$^\dagger$PADC-MAC: 88-89\% (high irradiance), 71-72\% (low irradiance).} \\
-\multicolumn{4}{|p{0.95\textwidth}|}{\textbf{Our improvement: 60-80 percentage points over traditional methods, with consistent 88-92\% accuracy across all conditions.}} \\
+\multicolumn{4}{|p{0.95\columnwidth}|}{$^*$EENA: Limited evaluation scope, may not generalize.} \\
+\multicolumn{4}{|p{0.95\columnwidth}|}{$^\dagger$PADC-MAC: 88-89\% (high irradiance), 71-72\% (low irradiance).} \\
+\multicolumn{4}{|p{0.95\columnwidth}|}{\textbf{Our improvement: 60-80 percentage points over traditional methods, with consistent 88-92\% accuracy across all conditions.}} \\
 \hline
-\end{tabular}
-\end{table*}
+\end{tabular}%
+}
+\end{table}
 
-\begin{figure*}[!t]
+\begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{comprehensive_comparison.png}
+\includegraphics[width=\columnwidth]{comprehensive_comparison.png}
 \caption{Comprehensive comparison with various state-of-the-art methods.}
 \label{fig:comprehensive_comparison}
-\end{figure*}
+\end{figure}
 
 \textbf{Key Observations:}
 \begin{itemize}
@@ -617,16 +647,19 @@ PADC-MAC (NARNET) \cite{ref11} & ML (NARNET) & 71-89\%$^\dagger$ & 2023 \\
 \item Full-range operability of the model was demonstrated in our experiments without any catastrophic predictions being registered.
 \end{itemize}
 
+\FloatBarrier
+
 \subsection{Detailed Model Performance Evaluation}
 
 \subsubsection{Performance per Range}
  Error statistics are shown for each operating range to analyze consistency across regimes.
 
-\begin{table*}[!t]
+\begin{table}[!htbp]
 \caption{Performance by Irradiance Range}
 \label{table:range}
 \centering
 \small
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{|l|c|c|c|}
 \hline
 \textbf{Range (W/m$^2$)} & \textbf{MAE} & \textbf{Bias} & \textbf{Samples} \\
@@ -641,15 +674,16 @@ PADC-MAC (NARNET) \cite{ref11} & ML (NARNET) & 71-89\%$^\dagger$ & 2023 \\
 \multicolumn{4}{|l|}{\textbf{Variance across ranges: 8.2-45.1 (5.5$\times$)}} \\
 \multicolumn{4}{|l|}{\textbf{vs PADC-MAC variance: 71-89\% (1.25$\times$ but lower baseline)}} \\
 \hline
-\end{tabular}
-\end{table*}
+\end{tabular}%
+}
+\end{table}
 
-\begin{figure*}[!t]
+\begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{per_range_performance.png}
+\includegraphics[width=\columnwidth]{per_range_performance.png}
 \caption{Performance by Irradiance range.}
 \label{fig:per_range_performance}
-\end{figure*}
+\end{figure}
 
 \textbf{Findings:}
 \begin{itemize}
@@ -662,11 +696,12 @@ PADC-MAC (NARNET) \cite{ref11} & ML (NARNET) & 71-89\%$^\dagger$ & 2023 \\
 \subsubsection{Ablation Study}
 Quantification of individual components' contribution is provided in Table~\ref{table:ablation}. 
 
-\begin{table*}[!t]
+\begin{table}[!htbp]
 \caption{Ablation Study Results}
 \label{table:ablation}
 \centering
 \small
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{|l|c|c|}
 \hline
 \textbf{Configuration} & \textbf{MAE (W/m$^2$)} & \textbf{Bias (W/m$^2$)} \\
@@ -679,15 +714,16 @@ Baseline CNN only & 52.3 & $-7.78$ \\
 \hline
 \multicolumn{3}{|l|}{\textbf{Total improvement: 17.1 W/m$^2$ (32.7\% reduction)}} \\
 \hline
-\end{tabular}
-\end{table*}
+\end{tabular}%
+}
+\end{table}
 
-\begin{figure*}[!t]
+\begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{ablation_study.png}
+\includegraphics[width=\columnwidth]{ablation_study.png}
 \caption{Ablation study Results.}
 \label{fig:ablation_study}
-\end{figure*}
+\end{figure}
 
 The ablation trend is clear and consistent:
 \begin{itemize}
@@ -696,19 +732,21 @@ The ablation trend is clear and consistent:
 \item \textbf{Batch normalization:} Increases performance by 3.7~W/m$^2$ thanks to improved optimization convergence.
 \end{itemize}
 
-\begin{figure*}[!t]
+\begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{predicted_vs_actual.png}
+\includegraphics[width=\columnwidth]{predicted_vs_actual.png}
 \caption{Predicted VS Actual Irradiance analysis.}
 \label{fig:predicted_vs_actual}
-\end{figure*}
+\end{figure}
 
-\begin{figure*}[!t]
+\begin{figure}[H]
 \centering
-\includegraphics[width=\textwidth]{dashboard_01-26-2019.png}
+\includegraphics[width=\columnwidth]{dashboard_01-26-2019.png}
 \caption{Energy harvesting dashboard for the date: January 26, 2019.}
 \label{fig:dashboard}
-\end{figure*}
+\end{figure}
+
+\FloatBarrier
 
 % Discussion
 \section{Discussion}
@@ -834,18 +872,19 @@ Our evaluation focuses on coverage, robustness to edge cases, and practical perf
 
 \subsection{Advantages Summary: CNN vs Autoregressive}
 
-\begin{table*}[!t]
+\begin{table}[!htbp]
 \caption{Detailed Comparison of CNN vs Autoregressive Approaches}
 \label{table:cnn_vs_ar}
 \centering
 \small
+\resizebox{\columnwidth}{!}{%
 \begin{tabular}{|p{3cm}|p{2cm}|p{2cm}|}
 \hline
 \textbf{Aspect} & \textbf{NARNET} & \textbf{Our CNN} \\
 \hline
-\textbf{Input Type} & Time-series & Visual images \\
+\textbf{Input Type} & Time-series & Time-series (2 features) \\
 \hline
-\textbf{Feature Source} & Temporal patterns & Spatial patterns \\
+\textbf{Feature Source} & Temporal patterns & Temporal + derivative patterns \\
 \hline
 \textbf{Accuracy Range} & 71-89\% & \textbf{88-92\%} \\
 \hline
@@ -853,7 +892,7 @@ Our evaluation focuses on coverage, robustness to edge cases, and practical perf
 \hline
 \textbf{Low-light} & 71-72\% & \textbf{88-92\%} \\
 \hline
-\textbf{MAE} & 11.75-28.46\% & \textbf{35 W/m$^2$} \\
+\textbf{Error Metric} & PER: 11.75-28.46\% & MAE: \textbf{35 W/m$^2$} \\
 \hline
 \textbf{Rapid transitions} & Struggles & \textbf{Robust} \\
 \hline
@@ -863,8 +902,9 @@ Our evaluation focuses on coverage, robustness to edge cases, and practical perf
 \hline
 \textbf{Inference time} & ~50ms & \textbf{15ms} (INT8) \\
 \hline
-\end{tabular}
-\end{table*}
+\end{tabular}%
+}
+\end{table}
 
 \subsection{Limitations and Future Work}
 
@@ -881,7 +921,7 @@ Our evaluation focuses on coverage, robustness to edge cases, and practical perf
 \begin{enumerate}
 \item \textbf{CNN-LSTM Combination:} Extend the current framework to include sequential awareness.
 
-\item \textbf{Visual & Sensor Features Fusion:} Incorporate visual features and numerical sensor data (wind speed, temperature, etc.) via a multi-modality fusion algorithm:
+\item \textbf{Visual \& Sensor Features Fusion:} Incorporate visual features and numerical sensor data (wind speed, temperature, etc.) via a multi-modality fusion algorithm:
 \begin{equation}
 \hat{I}(t) = f_{fusion}(CNN(V_t), MLP(S_t))
 \end{equation}
