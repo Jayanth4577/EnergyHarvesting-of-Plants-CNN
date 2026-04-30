@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.15)  22 APR 2026 12:15
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.4.15)  26 APR 2026 17:19
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -497,231 +497,218 @@ LaTeX Font Info:    Trying to load font information for U+msb on input line 54.
 (C:\Users\jayan\AppData\Local\Programs\MiKTeX\tex/latex/amsfonts\umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-Underfull \hbox (badness 1859) in paragraph at lines 94--95
-[]\OT1/ptm/b/n/10 Pro-energy: \OT1/ptm/m/n/10 With the help of pro-file match-i
-ng, it
- []
-
 [1{C:/Users/jayan/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}{C:/Users/ja
 yan/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/base/8r.enc}
 
 
-]
-Underfull \hbox (badness 1521) in paragraph at lines 146--147
-[]\OT1/ptm/b/n/10 Comparisons with EWMA: \OT1/ptm/m/n/10 NAR-NET out-per-forms
- []
-
-[2]
-Underfull \hbox (badness 7256) in paragraph at lines 194--196
+] [2]
+Underfull \hbox (badness 7256) in paragraph at lines 169--171
 []\OT1/ptm/m/n/10 We model a wire-less sen-sor net-work as $\OMS/cmsy/m/n/10 N 
 \OT1/cmr/m/n/10 =
  []
 
 
-Underfull \hbox (badness 1783) in paragraph at lines 246--247
+Underfull \hbox (badness 1783) in paragraph at lines 221--222
 []\OT1/ptm/m/n/10 The har-vested com-po-nent de-pends on ir-ra-di-ance $\OML/cm
 m/m/it/10 I\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 t\OT1/cmr/m/n/10 )$
  []
 
 
-Underfull \hbox (badness 6332) in paragraph at lines 257--258
+Underfull \hbox (badness 6332) in paragraph at lines 232--233
 []\OT1/ptm/m/n/10 Historic so-lar mea-sure-ments: $\OMS/cmsy/m/n/10 I[] \OT1/cm
 r/m/n/10 = \OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 I\OT1/cmr/m/n/10 (\OML/cmm/m/it/1
 0 t \OMS/cmsy/m/n/10 ^^@
  []
 
 
-Underfull \hbox (badness 2564) in paragraph at lines 258--259
+Underfull \hbox (badness 2564) in paragraph at lines 233--234
 []\OT1/ptm/m/n/10 Historic im-ages (if avail-able): $\OMS/cmsy/m/n/10 V[] \OT1/
 cmr/m/n/10 = \OMS/cmsy/m/n/10 f\OML/cmm/m/it/10 V\OT1/cmr/m/n/10 (\OML/cmm/m/it
 /10 t \OMS/cmsy/m/n/10 ^^@
  []
 
 [3]
-Underfull \hbox (badness 7981) in paragraph at lines 337--338
+Underfull \hbox (badness 7981) in paragraph at lines 312--313
 []\OT1/ptm/b/n/10 High Vari-abil-ity: \OT1/ptm/m/n/10 Ir-ra-di-ance varies from
  0 to
  []
 
 
-Underfull \hbox (badness 6775) in paragraph at lines 353--354
+Underfull \hbox (badness 6775) in paragraph at lines 328--329
 []\OT1/ptm/b/n/10 Deployment ca-pac-ity: \OT1/ptm/m/n/10 Can be im-ple-mented o
 n
  []
 
 [4]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 455.
+put line 430.
  [5]
-Underfull \hbox (badness 1436) in paragraph at lines 560--561
+Underfull \hbox (badness 1436) in paragraph at lines 537--538
 []\OT1/ptm/m/n/10 Model de-vel-op-ment fol-lowed a three-iteration pro-cess,
  []
 
-<figures/iteration_comparison.png, id=428, 858.5676pt x 496.254pt>
+<figures/iteration_comparison.png, id=424, 858.5676pt x 496.254pt>
 File: figures/iteration_comparison.png Graphic file (type png)
 <use figures/iteration_comparison.png>
 Package pdftex.def Info: figures/iteration_comparison.png  used on input line 6
-32.
+09.
 (pdftex.def)             Requested size: 252.0pt x 145.65158pt.
-<figures/comprehensive_comparison.png, id=437, 1004.553pt x 571.6557pt>
+<figures/comprehensive_comparison.png, id=433, 1004.553pt x 571.6557pt>
 File: figures/comprehensive_comparison.png Graphic file (type png)
 <use figures/comprehensive_comparison.png>
 Package pdftex.def Info: figures/comprehensive_comparison.png  used on input li
-ne 677.
+ne 654.
 (pdftex.def)             Requested size: 252.0pt x 143.40204pt.
 
-Underfull \hbox (badness 1515) in paragraph at lines 684--685
+Underfull \hbox (badness 1515) in paragraph at lines 661--662
 []\OT1/ptm/m/n/10 The pro-posed model shows sig-nif-i-cantly bet-ter and
  []
 
 [6 <./figures/iteration_comparison.png> <./figures/comprehensive_comparison.png
 >]
-<figures/per_range_performance.png, id=447, 1003.1076pt x 424.9476pt>
+<figures/per_range_performance.png, id=444, 1003.1076pt x 424.9476pt>
 File: figures/per_range_performance.png Graphic file (type png)
 <use figures/per_range_performance.png>
 Package pdftex.def Info: figures/per_range_performance.png  used on input line 
-723.
+700.
 (pdftex.def)             Requested size: 252.0pt x 106.75536pt.
 
-Underfull \vbox (badness 2753) has occurred while \output is active []
-
-
-Underfull \hbox (badness 7963) in paragraph at lines 731--732
+Underfull \hbox (badness 7963) in paragraph at lines 708--709
 []\OT1/ptm/m/n/10 Bias is not uni-form across ranges ($\OMS/cmsy/m/n/10 ^^@\OT1
 /cmr/m/n/10 40\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 65$ \OT1/ptm/m/n/10 to
  []
 
-<figures/ablation_study.png, id=449, 1003.1076pt x 424.9476pt>
+<figures/ablation_study.png, id=446, 1003.1076pt x 424.9476pt>
 File: figures/ablation_study.png Graphic file (type png)
 <use figures/ablation_study.png>
-Package pdftex.def Info: figures/ablation_study.png  used on input line 763.
+Package pdftex.def Info: figures/ablation_study.png  used on input line 740.
 (pdftex.def)             Requested size: 252.0pt x 106.75536pt.
 [7 <./figures/per_range_performance.png> <./figures/ablation_study.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 772--773
+Underfull \hbox (badness 10000) in paragraph at lines 749--750
 []\OT1/ptm/b/n/10 Batch nor-mal-iza-tion: \OT1/ptm/m/n/10 In-creases per-for-ma
 nce by
  []
 
-<figures/predicted_vs_actual.png, id=465, 1149.093pt x 859.5312pt>
+<figures/predicted_vs_actual.png, id=461, 1149.093pt x 859.5312pt>
 File: figures/predicted_vs_actual.png Graphic file (type png)
 <use figures/predicted_vs_actual.png>
-Package pdftex.def Info: figures/predicted_vs_actual.png  used on input line 77
-8.
+Package pdftex.def Info: figures/predicted_vs_actual.png  used on input line 75
+5.
 (pdftex.def)             Requested size: 252.0pt x 188.49414pt.
-<figures/dashboard_01-26-2019.png, id=466, 1003.1076pt x 714.0276pt>
+<figures/dashboard_01-26-2019.png, id=462, 1003.1076pt x 714.0276pt>
 File: figures/dashboard_01-26-2019.png Graphic file (type png)
 <use figures/dashboard_01-26-2019.png>
 Package pdftex.def Info: figures/dashboard_01-26-2019.png  used on input line 7
-85.
+62.
 (pdftex.def)             Requested size: 252.0pt x 179.37807pt.
 [8 <./figures/predicted_vs_actual.png> <./figures/dashboard_01-26-2019.png>]
-Underfull \hbox (badness 5331) in paragraph at lines 885--886
+Underfull \hbox (badness 5331) in paragraph at lines 853--854
 []\OT1/ptm/m/n/10 Low-irradiance con-di-tions gen-er-ated in the data-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 []|\OT1/ptm/b/n/9 Mod Pro-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 []|\OT1/ptm/m/n/9 Time-series
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 []|\OT1/ptm/m/n/9 Temporal
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 []|\OT1/ptm/m/n/9 Pattern
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 \OT1/ptm/m/n/9 match-ing +
  []
 
 
-Underfull \hbox (badness 7851) in paragraph at lines 947--947
+Underfull \hbox (badness 7851) in paragraph at lines 915--915
 []|\OT1/ptm/m/n/9 Temporal +
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 \OT1/ptm/m/n/9 deriva-tive
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 []|\OT1/ptm/b/n/9 77.93%
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 \OT1/ptm/b/n/9 (100-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 []|\OT1/ptm/m/n/9 Weak
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 []|\OT1/ptm/b/n/9 MAE 8.23
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 []|\OT1/ptm/m/n/9 PER: 0.71-
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 []|\OT1/ptm/b/n/9 201
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 \OT1/ptm/b/n/9 catas-trophic
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 \OT1/ptm/b/n/9 fails
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 \OT1/ptm/b/n/9 (cur-rent
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 []|\OT1/ptm/m/n/9 Low
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 []|\OT1/ptm/b/n/9 53.55ms
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 947--947
+Underfull \hbox (badness 10000) in paragraph at lines 915--915
 \OT1/ptm/m/n/9 (mea-sured
  []
 
 [9]
-Underfull \hbox (badness 1540) in paragraph at lines 991--992
+Underfull \hbox (badness 1540) in paragraph at lines 959--960
 []\OT1/ptm/b/n/10 Building En-ergy Man-age-ment Sys-tem:\OT1/ptm/m/n/10 HVAC pr
 e-
  []
 
 
-Underfull \hbox (badness 2753) in paragraph at lines 992--993
+Underfull \hbox (badness 2753) in paragraph at lines 960--961
 []\OT1/ptm/b/n/10 Electric Ve-hi-cle Charg-ing Sta-tion: \OT1/ptm/m/n/10 Solar-
 powered
  []
@@ -735,18 +722,22 @@ Package balance Warning: You have called \balance in second column
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
  ***********
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
 Package rerunfilecheck Info: File `final_paper_with_new_references.out' has not
  changed.
 (rerunfilecheck)             Checksum: 84E4474058DE107E3A315F31D9309FE3;12636.
  ) 
 Here is how much of TeX's memory you used:
- 11536 strings out of 467870
- 182302 string characters out of 5418354
- 622115 words of memory out of 5000000
+ 11531 strings out of 467870
+ 182267 string characters out of 5418354
+ 623142 words of memory out of 5000000
  40048 multiletter control sequences out of 15000+600000
  672400 words of font info for 119 fonts, out of 8000000 for 9000
  1144 hyphenation exceptions out of 8191
- 75i,12n,79p,1165b,544s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 75i,12n,79p,1166b,544s stack positions out of 10000i,1000n,20000p,200000b,200000s
 <C:/Users/jayan/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/
 cmex10.pfb><C:/Users/jayan/AppData/Local/Programs/MiKTeX/fonts/type1/public/ams
 fonts/cm/cmmi10.pfb><C:/Users/jayan/AppData/Local/Programs/MiKTeX/fonts/type1/p
@@ -767,10 +758,10 @@ MiKTeX/fonts/type1/urw/times/utmb8a.pfb><C:/Users/jayan/AppData/Local/Programs/
 MiKTeX/fonts/type1/urw/times/utmbi8a.pfb><C:/Users/jayan/AppData/Local/Programs
 /MiKTeX/fonts/type1/urw/times/utmr8a.pfb><C:/Users/jayan/AppData/Local/Programs
 /MiKTeX/fonts/type1/urw/times/utmri8a.pfb>
-Output written on final_paper_with_new_references.pdf (11 pages, 3334786 bytes)
+Output written on final_paper_with_new_references.pdf (11 pages, 3334412 bytes)
 .
 PDF statistics:
- 632 PDF objects out of 1000 (max. 8388607)
- 214 named destinations out of 1000 (max. 500000)
+ 627 PDF objects out of 1000 (max. 8388607)
+ 209 named destinations out of 1000 (max. 500000)
  551 words of extra memory for PDF output out of 10000 (max. 10000000)
 

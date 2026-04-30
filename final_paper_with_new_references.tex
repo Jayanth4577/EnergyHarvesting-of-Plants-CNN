@@ -16,11 +16,12 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{placeins}
+\usepackage{float}
 
 % Correct hyphenation
 \hyphenation{op-tical net-works semi-conduc-tor}
 
-% Float placement tuning to keep figures/tables close to related text
+% Float placement tuning
 \setcounter{topnumber}{2}
 \setcounter{bottomnumber}{2}
 \setcounter{totalnumber}{4}
@@ -35,31 +36,27 @@
 
 \begin{document}
 
-% Paper title
-\title{CNN-Based Solar Energy Harvesting }
+\title{CNN-Based Solar Energy Harvesting}
 
-% Author names
 \author{E~Jayanth%
 }
 
-% The paper headers
 \markboth{IEEE Sensors Journal, Vol.~XX, No.~X, March~2026}%
 {Jayanth: CNN-Based Solar Energy Prediction for Sustainable WSNs}
 
-% Make the title area
 \maketitle
 
-% Abstract
 \begin{abstract}
-The use of solar cells in energy harvesting technologies is a promising step towards developing wireless sensor networks (WSN) with extended service life. Nevertheless, reliable functioning requires accurate forecasting of the energy supply. Predicting solar energy output is a difficult problem as the energy supply varies frequently because of cloudiness, periodicity, and seasonality effects. Common statistical approaches have rather poor accuracy, being able to produce accurate predictions with precision in the range of 11-29\%. Moreover, new autoregressive approaches suggested recently have poor performance at low irradiation levels and transition regimes. This paper proposes a new approach for predicting solar panel irradiation, which uses information extracted visually from solar panel or environment pictures with the help of CNNs. Under the test set in this repository, this model provides satisfactory accuracy in terms of MAPE E on irradiation above 10~W/m$^2$(77.93\%), with MAE of 36.44~W/m$^2$ and mean bias equal to $-8.39$~W/m$^2$.
+The use of solar cells in energy harvesting technologies is a promising step towards developing wireless sensor networks (WSN) with extended service life. Nevertheless, reliable functioning requires accurate forecasting of the energy supply. Predicting solar energy output is a difficult problem because the energy supply varies frequently due to cloudiness, periodicity, and seasonality. Common statistical approaches have rather poor accuracy, being able to produce accurate predictions with precision in the range of 11--29\%. Moreover, new autoregressive approaches suggested recently have poor performance at low irradiation levels and transition regimes. This paper proposes a new approach for predicting solar panel irradiation, which uses information extracted visually from solar panel or environment pictures with the help of CNNs. Under the test set in this repository, this model provides satisfactory accuracy in terms of MAPE on irradiation above 10~W/m$^2$ (77.93\%), with MAE of 36.44~W/m$^2$ and mean bias equal to $-8.39$~W/m$^2$.
 \end{abstract}
 
-% Keywords
 \begin{IEEEkeywords}
 Machine Learning, Deep Learning, CNNs, Energy Harvesting, Renewable Solar Energy Forecasting, WSN.
 \end{IEEEkeywords}
 
-% Introduction
+\section*{Nomenclature}
+W denotes watts, W/m$^2$ denotes watts per square meter, J denotes joules, Wh denotes watt-hours, and ms denotes milliseconds. Symbols used in the energy model include irradiance $I(t)$, harvested energy $E_{harvested}(t)$, consumed energy $E_{consumed}(t)$, battery charge $B(t)$ with capacity $B_{max}$, panel area $A$, conversion efficiency $\eta$, and sampling interval $\Delta t$.
+
 \section{Introduction}
 \IEEEPARstart{W}{ireless} Sensor Networks (WSNs) represent networks of power-limited sensors used for different applications such as environmental monitoring, border watching, IoT, and smart cities\cite{ref1}. A major restriction for WSNs is limited power availability owing to the battery capacity; thus, replacement of batteries becomes problematic \cite{ref2}.
 
@@ -67,69 +64,18 @@ Energy harvesting, especially by way of solar power, offers a means of decreasin
 
 In practical implementation, energy fluctuations affect sensing continuity, packet transmission rates, and even the sustainability of nodes. Inflated expectations about energy harvested result in over-scheduling of duty cycles, causing depletion of energy storage and thus preventing communication processes. On the other hand, under-estimated energy leads to networks being too cautious and under-utilization of available power, lowering the level of sensing resolution.
 
-As such, prediction quality in energy-harvesting WSNs becomes both an objective of forecasting and control. A good predictive algorithm must have good accuracy throughout the different levels of light intensities. Such an algorithm allows the energy management policies in the system to operate safely and in a timely manner. This is necessary because it becomes difficult when deploying at edges where resource availability is limited, and the model behavior should still be consistent.
+As such, prediction quality in energy-harvesting WSNs becomes both an objective of forecasting and control. A good predictive algorithm must have good accuracy throughout the different levels of light intensities. Such an algorithm allows the energy management policies in the system to operate safely and on time. This is necessary because it becomes difficult when deploying at edges where resource availability is limited, and the model behavior should still be consistent.
 
 In the current research, there is an attempt to create an energy-harvesting deployment-based solution that combines accuracy in prediction and feasibility in real-time applications. The main aim is full irradiance range prediction, good performance in unfavorable conditions, and minimum runtime overhead.
 
-\subsection{Problem Statement}
-\textbf{Problem:} In case of changing irradiance and need for constant operation, what algorithm should be designed for predicting solar radiation and managing energy in the network?
-
-
-\textbf{Research Questions:}
-\begin{enumerate}
-\item What methods allow for efficient solar energy prediction throughout the full range (0-1200~W/m$^2$)?
-\item What methods are capable of handling extreme cases (e.g., nighttime 0~W/m$^2$, cloudy weather, etc.)?
-\item What methods allow utilizing information obtained from solar panel images or the nearby environment?
-\item Where should the trade-off between accuracy and efficiency in computations be considered?
-\end{enumerate}
-
-\subsection{Limitations of Existing Approaches}
-
-\subsubsection{Previous Predictions}
-Current pipeline algorithms used to compute the solar radiation values in energy harvesting, WSNs, depend on traditional statistics approaches for predictions:
-
-\begin{itemize}
-\item \textbf{EWMA (Exponential Weighted Moving Average):} It is a lightweight strategy that predicts with an error of 5-15\% because of its inability to manage the drastic weather condition change \cite{ref5}.
-\item \textbf{WCMA (Weather Conditioned Moving Average):}  It provides a better accuracy of 10-20\%; however, more computation will be needed because of the inclusion of weather parameters \cite{ref6}.
-\item \textbf{Pro-energy:}  With the help of profile matching, it achieves an accuracy of 7-25\%; however, it fails to predict when the current weather profile is changing \cite{ref7}.
-\item \textbf{Pro-energy with Correction:} Although the model's efficiency is further improved during the correction step, the variability rate remains quite high (PER: 0.71-2.09), providing 11-29\% accuracy \cite{ref8}.
-\end{itemize}
-
-\subsubsection{Machine Learning Predictions}
-More recently, scientists have applied the autoregressive-based neural network for predicting solar irradiance levels:
-
-\textbf{AR-NN Models:}  The efficiency of the SARANG \cite{ref11} model is highly efficient when the conditions are high (88-89\%), whereas it becomes less efficient under low irradiance conditions (71-72\%); MAE= 28.46\%. The EENA-NARNET algorithm has very good prediction capability \cite{ref12}; however, its evaluation was carried out considering certain aspects only.
-
-\textbf{Basic Limitations:} The problem faced by these models lies with their stability and inconsistency.
-
 \subsection{Motivation}
-For the practical usage of WSNs, it is necessary that the quality of predictions be good enough to enable safe duty-cycle control and power-efficient scheduling. Existing models still significantly underperform in this regard, and, despite significant advances in recent years, autoregressive architectures still show highly unstable performance on different weather conditions. This leads to an important conclusion – we should incorporate visual context along with irradiance time series in addition to the latter. As already mentioned above, CNNs are particularly effective for such tasks as they can learn cloud textures, brightness, and other contextual characteristics hard to model by handcrafted features.
+For the practical usage of WSNs, it is necessary that the quality of predictions be good enough to enable safe duty-cycle control and power-efficient scheduling. Existing models still significantly underperform in this regard, and, despite significant advances in recent years, autoregressive architectures still show highly unstable performance on different weather conditions. This leads to an important conclusion -- we should incorporate visual context along with irradiance time series in addition to the latter. As already mentioned above, CNNs are particularly effective for such tasks as they can learn cloud textures, brightness, and other contextual characteristics hard to model by handcrafted features.
 
-\subsection{Our Contribution}
-This paper offers a \textbf{deep learning} framework for irradiance predictions in solar-powered wireless networks, emphasizing consistent operation across different operating conditions. By utilizing the visual input and applying the method of iterative development and deployment-oriented analysis, we achieve the following results:
-
-\begin{enumerate}
-\item  CNN architecture for visual predictions of irradiance from panel/environment images. We apply an edge-case aware training technique by introducing the weighted loss function.
-
-\item Reproducible performance on the held-out split – effective accuracy (defined as $100-\mathrm{MAPE}$ for the Irradiance $>10$~W/m$^2$) is 77.93\%, with MAE = 36.44~W/m$^2$ and the mean bias (predicted-actual) = $-8.39$~W/m$^2$.
-
-\item Stability in edge cases – our experiments show the lack of catastrophic failures during night-time, low-lighting, and high-irradiance periods.
-
-\item Three iteration development cycle with ablation testing of the effects of weighted loss, data augmentation, and batch normalization.
-
-\item Performance and energy estimation for practical implementation – edge-performance testing and computational overhead estimates prove the feasibility of using our model for inference in a practical setting.
-
-\item Integrated analytical framework – we provide a formulation incorporating node-level energy dynamics, photovoltaics, and comparative empirical analysis.
-\end{enumerate}
-
-The rest of the paper is organized as follows. Section II reviews related literature. Section III provides problem formulation and model description. Section IV gives a detailed description of the methodology used in the paper. Section V contains experimental results. In Section VI, we discuss the implications of our study and suggest ways for future work. The conclusion is provided in Section VII.
-
-% Related Work
 \section{Related Work}
 
 \subsection{Conventional Statistical Methods}
 
-Conventional research on WSN energy prediction focused on statistical time series analysis techniques. The Exponentially Weighted Moving Average (EWMA) method\cite{ref5}  is computationally efficient and easy to implement; nevertheless, owing to its short memory nature, it has difficulty adapting to sudden changes in weather, providing accuracy figures ranging between 5-15\%.WCMA \cite{ref6}, which improves EWMA by adding weather-similarity measures (GAP$_k$), achieves typical accuracy levels of 10-20\%, although the process involves a higher computational cost since it repeats similarity computation. Pro-Energy \cite{ref7} adopts profile matching and dynamic time slots but still suffers from poor performance when a suitable historical analog does not exist, providing typical accuracy figures of 7-25\% and sometimes suffering large failures. In Modified Pro-Energy\cite{ref8}, a mechanism to correct errors makes the method more robust, but it still presents a very wide range (PER: 0.71-2.09) and accuracy figures of 11-29\%.
+Traditional research in WSN energy consumption prediction has mainly been focused on time-series models. Although the Exponentially Weighted Moving Average (EWMA) algorithm \cite{ref5} has the advantage of being simple and fast, it is not sufficiently adaptive to sudden changes in weather conditions due to its short memory property, leading to relatively low accuracy values from 5\% to 15\%. The Weather Condition-based Moving Average Algorithm (WCMA) \cite{ref6} improves EWMA by utilizing GAP$_k$, which reflects weather condition similarity. It provides good accuracy from 10\% to 20\%, but at the expense of higher complexity since GAP$_k$ needs to be recomputed frequently. Similarly, Pro-Energy \cite{ref7} makes use of profile comparison and dynamic time slots but shows poor results in terms of performance whenever there is no suitable historical counterpart. Its accuracy varies from 7\% to 25\%, and it suffers from huge errors occasionally. The harvested energy prediction study in \cite{ref8} (Modified Pro-Energy) introduces a correction mechanism that improves robustness, but it still presents a very wide range (PER: 0.71--2.09) and accuracy figures of 11--29\%.
 
 \subsection{Machine Learning Techniques}
 
@@ -139,89 +85,24 @@ It appears that there has been extensive exploration of classical machine learni
 \subsubsection{Autoregressive Neural Network Approaches}
 Most recent papers focus on autoregressive neural networks; in particular, NARNET-based approaches.
 
-\textbf{PADC-MAC Protocol:} The authors of Sarang et al. \cite{ref11} adopted NARNET in the development of a prediction-aware MAC protocol, evaluating it with the use of NREL data. Their results clearly demonstrate improvements over EWMA, although there is a clear condition mismatch as well:
-\begin{itemize}
-\item \textbf{High irradiance performance:} 88-89\% accuracy,Mean Absolute Error (MAE) 11.75\%, correlation coefficient $R = 0.98$
-\item \textbf{Low irradiance performance:} 71-72\% accuracy, Mean Absolute Error (MAE) 28.46\%, correlation coefficient $R = 0.95$
-\item \textbf{Comparisons with EWMA:} NARNET outperforms EWMA by 30.47\% and 28\% respectively in high/low irradiance conditions
-\item \textbf{Network performance:} Achieves 10.7-13.5\% end-to-end delay reduction and an 81\%reduction in energy consumption in the MAC protocol.
-\end{itemize}
-
-From the degradation of performance from high irradiance to low irradiance conditions, it can be observed that purely temporal models may have difficulty handling irradiance dynamics' regime change.
-
-\textbf{EENA Algorithm:} Bhuvaneswari et al. \cite{ref12} report accuracy figures of 99.62\% in EENA-NARNET but also provide comparisons with WCMA and Pro-Energy:
-\begin{itemize}
-\item Prediction error: 0.38\% (EENA) vs 0.7\% (Pro-Energy) vs 1.3\% (WCMA)
-\item Energy levels on sunny days: 2.0~J vs 1.38~J vs 0.8~J
-\item Irradiance from solar source: 810~W/m$^2$ vs 890~W/m$^2$ vs 900~W/m$^2$
-\end{itemize}
-
-Nevertheless, there remain numerous issues with respect to methodology:
-\begin{enumerate}
-\item \textbf{Limited assessment scope:} evaluation of the system carried out only for sunny and cloudy weather types, but without any regard to nighttime and fast transition situations.
-\item \textbf{No range coverage check:}  lack of information about validity of predictions within the full 0-1200~W/m$^2$ range
-\item \textbf{ Lack of catastrophic scenario assessment:} no mention of such a factor
-\item \textbf{High degree of accuracy:} unusually high accuracy of 99.62\% 
-\item \textbf{ Publication type:} less rigorous peer review compared to journal publications
-\end{enumerate}
-
+The proposed protocol PADC-MAC in \cite{ref11} involves incorporating NARNET into a prediction-aware MAC approach. The performance of NARNET has been evaluated using NREL data and shows satisfactory results under high irradiance with 88 to 89\%  accuracy, MAE = 11.75\%, and correlation coefficient R = 0.98. For low irradiance, the accuracy decreases to 71-72\%, MAE = 28.46\%, and R = 0.95. However, even under such circumstances, NARNET outperforms EWMA in terms of accuracy by 30.47\% under high irradiance conditions and by 28\% in the case of low irradiance. The MAC protocol allows decreasing the end-to-end delay by 10.7-13.5\% and reduces energy usage by 81\%. Thus, the degradation when moving from one irradiance condition to another can be explained by the inability of temporal models to cope with changing regimes.
+According to Bhuvaneswari et al. \cite{ref12}, the prediction error for EENA-NARNET is equal to 0.38\%, and the model achieves 99.62\% accuracy. The comparison with WCMA and Pro-Energy showed the following results: prediction error equals 0.7\% and 1.3\% for Pro-Energy and WCMA, respectively. On sunny days, the energy consumption amounts to 2.0~J for EENA vs. 1.38~J for Pro-Energy and 0.8~J for WCMA. Moreover, the irradiance of the solar power source is 810~W/m$^2$ for EENA, while it is 890~W/m$^2$ and 900~W/m$^2$ for the other approaches. However, there are some significant drawbacks associated with the methodology used in the study: only sunny and cloudy weather was taken into account, but not nighttime, and the fast transition between the two regimes. Besides, there is no assessment of the range coverage on the whole scale of values (0--1200~W/m$^2$), as well as no catastrophic scenario. Finally, the accuracy seems too high -- 99.62\% -- which is unusual for the field. Publication in conference proceedings is also less credible compared to a journal paper.
 \subsubsection{Limitations of Autoregressive Approaches}
-Even though it is evident that autoregressive models show better performance compared to statistical baseline approaches, there are certain limitations associated with such methodologies:
-
-\begin{enumerate}
-\item \textbf{Time dependency:} Such approaches make use of irradiance trajectory information but do not take into account spatial weather features.
-\item \textbf{Condition sensitivity:} Reported performance can vary widely across irradiance regimes (for example, 71-89\% in \cite{ref11}).
-\item \textbf{Transition fragility:} Fast cloud transitions reduce the predictive value of recent-history assumptions.
-\item \textbf{Design overhead:} Lag structure and feature configuration require careful tuning for each deployment.
-\end{enumerate}
+While autoregressive models have shown superior performance compared to statistical baselines, they suffer from certain limitations. They incorporate an irradiance sequence but lack the consideration of spatial weather conditions. Observed performance varies greatly depending on the irradiance regime (e.g., 71--89\% in \cite{ref11}). Rapid changes in clouds negate recent history assumptions, resulting in transition fragility. Further, the proper choice of lag structure and feature combination poses a design burden.
 
 \subsection{Deep Learning Gap in Energy Prediction}
 
-Although deep learning has advanced forecasting in many domains, visual CNN-based irradiance prediction for WSN-scale energy management remains underexplored. Most prior deep learning applications in energy systems target different operating constraints:
-\begin{itemize}
-\item Grid-level forecasting for utility systems, where compute and latency constraints differ substantially from embedded WSN nodes
-\item Building-level prediction based on numerical sensors, typically without a visual panel or sky information
-\item Satellite-imagery weather modeling, which often assumes cloud-scale infrastructure
-\end{itemize}
+While deep learning has revolutionized forecasting for various application areas, the use of a visual CNN for irradiance prediction in wireless sensor network (WSN)-scale energy management has seen little attention. First, deep learning for energy systems focuses primarily on grid forecasting for utilities rather than embedded WSNs, and compute/latency constraints for the two domains differ greatly. Second, even in buildings where deep learning has been applied for prediction purposes, it has used numerical input from sensors excluding panel/sky pictures, and third, in satellite imagery models where weather is predicted through cloud movement, large-scale infrastructure is assumed. The current study fills this gap by evaluating a visual CNN pipeline under constraints of a WSN environment and showing that, not only can it predict irradiance with high accuracy, but that its behavior remains stable across operating conditions while being well-suited for edge deployment.
 
-Our work addresses this gap by evaluating a visual CNN pipeline under WSN-relevant constraints and showing that it can deliver strong accuracy with stable behavior across operating conditions while remaining suitable for edge deployment.
+\section{Contributions}
+This paper proposes a deep learning-based approach for predicting irradiance for solar-powered wireless communication networks, focusing on reliable model performance over a wide variety of operating points. An irradiance predictor based on CNN predicts irradiance from a panel image or environmental picture using an edge–case–aware weighted loss function. On the test set of the repository at hand, the effective accuracy (defined as $100-\mathrm{MAPE}$) of irradiance over 10~W/m$^2$ is 77.93\%, MAE is 36.44~W/m$^2$, and mean bias is $-8.39$~W/m$^2$. The model goes through three iterations with the ablation studies involving weighted loss, data augmentation, and batch normalization, and the analysis includes energy calculations and the photovoltaic formulation used for the harvested-energy prediction.
 
-% Problem Formulation - ENHANCED
-\section{Problem Formulation and System Model}
+\section{Preliminaries and System Model}
 
 \subsection{Network and Node Model}
 
 We model a wireless sensor network as $\mathcal{N} = \{n_1, n_2, \ldots, n_N\}$, where $N$ nodes are deployed over a region of interest $\mathcal{R}$.
-Each node $n_i \in \mathcal{N}$ includes the following components:
-
-\begin{itemize}
-\item \textbf{Solar Energy Harvesting Module:}
-  \begin{itemize}
-  \item Photovoltaic panel with area $A$ (m$^2$)
-  \item Maximum power point tracking (MPPT) circuit
-  \item Energy conversion efficiency $\eta$ (typically 15-20\%)
-  \end{itemize}
-
-\item \textbf{Energy Storage:}
-  \begin{itemize}
-  \item Rechargeable battery with capacity $B_{max}$ (Wh)
-  \item Current charge level $B(t)$ where $0 \leq B(t) \leq B_{max}$
-  \item Charge/discharge efficiency $\eta_b$ (typically 85-95\%)
-  \end{itemize}
-
-\item \textbf{Sensing and Computing:}
-  \begin{itemize}
-  \item Microcontroller (e.g., ARM Cortex-M4)
-  \item Environmental sensors (temperature, humidity, etc.)
-  \item Camera or image sensor (optional, for visual prediction)
-  \end{itemize}
-
-\item \textbf{Communication:}
-  \begin{itemize}
-  \item Wireless transceiver (e.g., IEEE 802.15.4, LoRa)
-  \item Transmission power range: $P_{tx,min}$ to $P_{tx,max}$
-  \end{itemize}
-\end{itemize}
+Each node $n_i \in \mathcal{N}$ comprises four main components. The solar energy harvesting module consists of a photovoltaic panel with area $A$ (m$^2$), a maximum power point tracking (MPPT) circuit, and an energy conversion efficiency $\eta$ of typically 15--20\%. The energy storage component includes a rechargeable battery with maximum capacity $B_{max}$ (Wh), current charge level $B(t)$ constrained by $0 \leq B(t) \leq B_{max}$, and charge/discharge efficiency $\eta_b$ of typically 85--95\%. The sensing and computing unit comprises a microcontroller such as an ARM Cortex-M4, environmental sensors for temperature, humidity, and similar parameters, and an optional camera or image sensor for visual prediction. The communication module includes a wireless transceiver compliant with the IEEE 802.15.4 or LoRa standards, with the transmission power ranging from $P_{tx, min}$ to $P_{tx, max}$.
 
 \subsection{Energy Dynamics}
 
@@ -252,32 +133,14 @@ where $\Delta t$ is the length of the sampling period (e.g., one minute).
 
 \subsection{Prediction Problem Definition}
 
-Inputs to the predictor model at time $t$ include:
-\begin{itemize}
-\item Historic solar measurements: $\mathcal{I}_{histo}  =  \{I(t-k), \ldots, I(t-1)\}$
-\item Historic images (if available): $\mathcal{V}_{histo} = \{V(t-k), \ldots, V(t-1)\}$
-\item Environmental inputs at time $t$: $E_{envi}(t)$ (e.g., temperature and weather)
-\item Current battery level: $B(t)$
-\end{itemize}
-
-The model outputs:
-\begin{itemize}
-\item Future irradiance: $\hat{I}(t+1), \hat{I}(t+2), \ldots, \hat{I}(t+h)$ for prediction horizon $h$
-\item Prediction confidence intervals: $[\hat{I}(t+i) - \delta_i, \hat{I}(t+i) + \delta_i]$
-\end{itemize}
+Inputs to the predictor model at time $t$ include historic solar measurements $\mathcal{I}_{histo} = \{I(t-k), \ldots, I(t-1)\}$, historic images if available $\mathcal{V}_{histo} = \{V(t-k), \ldots, V(t-1)\}$, environmental inputs at time $t$ denoted $E_{envi}(t)$ such as temperature and weather, and the current battery level $B(t)$. The model outputs future irradiance $\hat{I}(t+1), \hat{I}(t+2), \ldots, \hat{I}(t+h)$ for prediction horizon $h$, along with the prediction confidence intervals $[\hat{I}(t+i) - \delta_i, \hat{I}(t+i) + \delta_i]$.
 
 The primary objective is to minimize prediction error:
 \begin{equation}
 \text{minimize} \quad \mathbb{E}\left[|I(t) - \hat{I}(t)|\right]
 \end{equation}
 
-Constraints to consider when deploying the predictor include:
-\begin{itemize}
-\item Cost of inference must be tractable for embedded implementation
-\item Prediction delay $< 1$ second for real-time prediction
-\item Model memory footprint $<$ 10MB
-\item Inference energy overhead $< 1\%$ of total harvested energy per day
-\end{itemize}
+Constraints to consider when deploying the predictor include: The inference cost must be tractable for embedded implementation; The prediction delay must be less than 1 second for real-time prediction; The model memory footprint must be less than 10~MB; and the inference energy overhead must be less than 1\% of total harvested energy per day.
 
 \subsection{Energy Neutral Operation (ENO)}
 
@@ -286,10 +149,7 @@ Sustainability in the long run means that the network can operate in an energy-n
 \sum_{t=1}^{T} E_{harvested}(t)  \geq  \sum_{t=1}^{T} E_{consumed}(t)
 \end{equation}
 
-Predictive estimates $\hat{I}(t)$ can be used to formulate the following energy-aware policies:
-
-\begin{enumerate}
-\item \textbf{Duty Cycle Adaptation:}
+Predictive estimates $\hat{I}(t)$ can be used to formulate energy-aware policies as follows. For the duty cycle adaptation:
 \begin{equation}
 D(t+1) = \begin{cases}
 D_{high} & \text{if } \hat{I}(t+1) > I_{threshold} \\
@@ -297,12 +157,7 @@ D_{low} & \text{otherwise}
 \end{cases}
 \end{equation}
 
-\item \textbf{Task Scheduling:} Prioritize energy-intensive tasks (e.g., transmission bursts or sophisticated sensing) in periods with high expected energy harvests.
-
-\item \textbf{Battery Management:} Limit activity in expectation of low energy to avoid deep battery depletion.
-
-\item \textbf{Network Optimization:} Adjust multihop route choice based on node energy forecasts.
-\end{enumerate}
+Beyond duty cycle control, the task scheduling prioritizes energy-intensive tasks such as transmission bursts or sophisticated sensing in periods with high expected energy harvests. The battery management limits activity in expectation of low energy to avoid deep battery depletion. Network optimization adjusts multihop route choice based on node energy forecasts.
 
 \subsection{Solar Harvesting Physical Model}
 
@@ -312,59 +167,30 @@ I_{pv} = I_{ph} - I_0\left[\exp\left(\frac{V_{pv}+I_{pv}R_s}{a V_T}\right) - 1\r
 - \frac{V_{pv} + I_{pv}R_s}{R_{sh}}
 \end{equation}
 
-where:
-\begin{itemize}
-\item $I_{ph}$ = photocurrent depending on to irradiance $I(t)$
-\item $I_0$ = Reversed saturation current
-\item $V_{pv}$ = PV cell voltage
-\item $R_s$ = series resistance
-\item $R_{sh}$ = shunt resistance
-\item $a$ = diode ideality factor
-\item $V_T = \frac{kT}{q}$ = Thermal Voltage ($k$ = Boltzmann constant, $T$ = Temperature, $q$ = Electron charge)
-\end{itemize}
+where $I_{ph}$ is the photocurrent depending on the irradiance $I(t)$, $I_0$ is the reversed saturation current, $V_{pv}$ is the PV cell voltage, $R_s$ is the series resistance, $R_{sh}$ is the shunt resistance, $a$ is the diode ideality factor, and $V_T = \frac{kT}{q}$ is the thermal voltage ($k$ is Boltzmann's constant, $T$ is temperature, and $q$ is electron charge).
 
 The photocurrent model is defined as follows:
 \begin{equation}
 I_{ph} = [I_{sc,ref} + K_i(T - T_{ref})] \cdot \frac{I(t)}{I_{ref}}
 \end{equation}
 
-where $I_{sc,ref}$ is a short-circuit current value under reference conditions, $K_i$ is the Temperature coefficient, and $I_{ref}=1000$ W/m$^2$ is the reference irradiance.
+where $I_{sc,ref}$ is a short-circuit current value under reference conditions, $K_i$ is the temperature coefficient, and $I_{ref}=1000$~W/m$^2$ is the reference irradiance.
 
 \subsection{Challenges and Requirements}
 
 \subsubsection{Prediction Challenges}
-\begin{enumerate}
-\item \textbf{High Variability:} Irradiance varies from 0 to 1200~W/m$^2$ within hours
-\item \textbf{Weather Dependence:} Clouds can cause irradiance drop from 80-90\% in less than one second.
-\item \textbf{Seasonal Factors:} The length of the day can change from 8 to 16 hours, and the angle of sun rays changes more than 46$^\circ$+ during the whole year.
-\item \textbf{Corner cases:}The models should be able to handle night time (I = 0~W/m$^2$), heavy clouds (I$<$30~W/m$^2$), and maximum possible irradiance(I$>$1000~W/m$^2$)
-\item \textbf{Location Dependence:}Models have to adapt to geometry, shadowing, micro-climatic, and other local factors.
-\item \textbf{Consistency requirement:} For practical purposes, it should have reliable performance across conditions; not just work well on average cases.
-\end{enumerate}
+Several prediction challenges must be addressed. Irradiance varies from 0 to 1200~W/m$^2$ within hours, presenting a high variability. Weather dependence is also significant, as the clouds can cause irradiance to drop by 80--90\% in less than one second. The Seasonal factors mean the day length can change from 8 to 16 hours, and the solar angle changes by more than 46$^\circ$ over the year. Corner cases require that models handle night-time ($I = 0$~W/m$^2$), heavy clouds ($I < 30$~W/m$^2$), and maximum irradiance ($I > 1000$~W/m$^2$). Location dependence means models must adapt to the local geometry, shadowing, micro-climatic, and other factors. Finally, a consistency requirement dictates that the model must have reliable performance across conditions, not just in average cases.
 
 \subsubsection{System Requirements}
-\begin{enumerate}
-\item \textbf{Precision:} Mean absolute error $< 40$~W/m$^2$ to allow proper energy consumption regulation.
-\item \textbf{Comprehensive Coverage:}Valid for all values in 0-1200~W/m$^2$.
-\item \textbf{Robustness:} Zero catastrophic failures (error $> 100\%$ of actual)
-\item \textbf{Consistency:} Less than 5\%  performance variance across weather conditions (to overcome NARNET's 71-89\% variability range).
-\item \textbf{Low Latency:} Provide real-time predictions with $<$ 1 second lag.
-\item \textbf{Low energy Efficiency:}  Require no more than $<$ 1\% of daily energy to run.
-\item \textbf{Deployment capacity:} Can be implemented on resource-constrained platforms (e.g., Raspberry Pi, Arduino Due).
-\end{enumerate}
+The system requirements are as follows. Precision requires a mean absolute error below 40~W/m$^2$ to allow proper energy consumption regulation. Comprehensive coverage must be valid for all the values in the 0--1200~W/m$^2$ range. Robustness demands zero catastrophic failures, defined as errors exceeding 100\% of the actual value. Consistency requires less than 5\% performance variance across weather conditions, to overcome NARNET's 71--89\% variability range. Low latency requires real-time predictions with less than 1~second lag. The method must also have low energy overhead, requiring no more than 1\% of daily energy to run inference. Finally, deployment capacity requires that the model can be implemented on resource-constrained platforms such as the Raspberry Pi or the Arduino Due.
 
-% Methodology
-\section{Proposed CNN-Based Prediction Methodology}
+\section{Problem Statement}
+The core problem addressed by this investigation involves the design of an algorithm for predicting solar radiation and managing energy within the grid based on different levels of irradiation while keeping operations constant. As a result, four research questions arise: which procedures can ensure reliable forecasting of solar energy at all levels of irradiation (0 to 1200~W/m$^2$); what can be done to handle situations with extreme irradiation levels like night-time(0~W/m$^2$) or cloudy days; which mechanisms allow the utilization of data from images taken by solar cells or their surroundings; and how to balance accuracy and computational performance.
+
+\section{Our Model}
 
 \subsection{Architecture Overview}
-The proposed solution architecture takes as input a sequence of 60-step windows with two features (irradiance and its first derivative) and produces a scalar irradiance estimation in W/m$^2$.The architecture includes four parts:
-
-\begin{enumerate}
-\item \textbf{Temporal Conv1D Feature Extractor:}Learns short-term and medium-term irradiance patterns using the sensor data history.
-\item \textbf{Temporal Attention Block:}Assigns weights to different time points, allowing the model to emphasize significant information.
-\item \textbf{Dense Regression Head:} Maps compact temporal features to irradiance values.
-\item \textbf{Output Constraint:} Uses ReLU activation to enforce Non-negative predictions.
-\end{enumerate}
+The proposed solution architecture takes as input a sequence of 60-step windows with two features (irradiance and its first derivative) and produces a scalar irradiance estimation in W/m$^2$. The architecture consists of four parts: a Temporal Conv1D Feature Extractor that learns short-term and medium-term irradiance patterns using the sensor data history; a Temporal Attention Block that assigns weights to different time points, allowing the model to emphasize significant information; a Dense Regression Head that maps compact temporal features to irradiance values; and an Output Constraint using ReLU activation to enforce non-negative predictions.
 
 \subsection{CNN Architecture}
 Network architecture details are listed in Table~\ref{table:architecture}.
@@ -382,12 +208,12 @@ Network architecture details are listed in Table~\ref{table:architecture}.
 Input & 60 timesteps, 2 features & (60, 2) \\
 \hline
 Conv1D-1 & 32 filters, kernel 5, same, ReLU & (60, 32) \\
-BatchNorm-1 & - & (60, 32) \\
+BatchNorm-1 & -- & (60, 32) \\
 MaxPool-1 & pool size 2 & (30, 32) \\
 Dropout-1 & 0.3 & (30, 32) \\
 \hline
 Conv1D-2 & 16 filters, kernel 3, same, ReLU & (30, 16) \\
-BatchNorm-2 & - & (30, 16) \\
+BatchNorm-2 & -- & (30, 16) \\
 MaxPool-2 & pool size 2 & (15, 16) \\
 Dropout-2 & 0.3 & (15, 16) \\
 \hline
@@ -395,7 +221,7 @@ Temporal Attention & Dense(16) + Dense(1) + softmax weighting & (15, 16) \\
 \hline
 GlobalAveragePooling1D & - & (16) \\
 Dense-1 & 32 units, ReLU & (32) \\
-BatchNorm-3 & - & (32) \\
+BatchNorm-3 & -- & (32) \\
 Dropout-3 & 0.3 & (32) \\
 \hline
 Output & Dense(1) + ReLU & (1) \\
@@ -405,6 +231,8 @@ Output & Dense(1) + ReLU & (1) \\
 \end{tabular}%
 }
 \end{table}
+
+\section{Proposed Work}
 
 \subsection{Key Innovations}
 
@@ -435,15 +263,10 @@ h_{\delta}(e)=
 This weighting gives more importance to night-time operations and low-irradiance cases, which are important for practical safety in scheduling battery operations.
 
 \subsubsection{Data Augmentation Approach}
-For handling class imbalance and increasing generalization ability, we employed the following strategies:
-\begin{itemize}
-\item \textbf{Time-Based Oversampling:} $3\times$ oversampling for low-light data (irradiance $<$ 30~W/m$^2$).
-\item \textbf{Stratified Sampling:} Splitting train/test/validation set into irradiance buckets [0-30, 30-100, 100-500, 500-1200].
-\item \textbf{Photometric Jittering:} Brightness and contrast perturbations with amplitude of ($\pm$20\%) to simulate lighting variations.
-\end{itemize}
+For handling class imbalance and increasing generalization ability, three strategies are employed: the time-based oversampling at $3\times$ for low-light data (irradiance below 30~W/m$^2$); the stratified sampling that splits the train/test/validation set into irradiance buckets [0--30, 30--100, 100--500, 500--1200]; and the photometric jittering with brightness and contrast perturbations of amplitude $\pm$20\% to simulate lighting variations.
 
 \subsubsection{Batch Normalization}
-A batch normalization layer is added after each Convolutional layer.
+A batch normalization layer is added after each convolutional layer.
 \begin{equation}
 \hat{x} = \frac{x - \mu_B}{\sqrt{\sigma_B^2 + \epsilon}}
 \end{equation}
@@ -455,7 +278,7 @@ As shown in the ablation study, this component contributes to a measurable MAE r
 \caption{CNN Training for Solar Prediction}
 \label{alg:training}
 \begin{algorithmic}[1]
-\STATE \textbf{Input:} Training sequences $\mathcal{X}_{train}$, Irradiance labels
+\STATE \textbf{Input}: Training sequences $\mathcal{X}_{train}$, Irradiance labels
 $Y_{train}$
 \STATE \textbf{Output:} Trained CNN model $\theta^*$
 \STATE
@@ -511,101 +334,61 @@ At deployment, the system operates as Algorithm~\ref{alg:inference}.
 \end{algorithm}
 
 \subsection{Computational Complexity}
-\textbf{Training:} Complexity is $O(P \cdot B \cdot F)$, where $P$ is parameter count ($\approx$3.1K), $B$ is batch size (64), and $F$ is per-layer FLOPs.
+Training complexity is $O(P \cdot B \cdot F)$, where $P$ is parameter count ($\approx$3.1K), $B$ is batch size (64), and $F$ is per-layer FLOPs. The inference run time complexity is $O(F)$, and the measurement is estimated at about 53.55~ms per sample in the current CPU setup. Timing results for INT8 quantization have not been included in this version.
 
-\textbf{Inference:} Runtime is $O(F)$ and measured at approximately 53.55~ms per sample on the current CPU setup. INT8 quantization timing is not reported in this version.
-
-% Results
-\section{Experimental Results and Analysis}
+\section{Results and Analysis}
 
 \subsection{Experimental Setup}
-\textbf{Dataset:}  For the research, the NREL Solar Radiation Research Laboratory (BMS) dataset has been used, covering a one-year span from 01/26/2019 to 01/26/2020 at minute resolution.
+For the research, the NREL Solar Radiation Research Laboratory (BMS) dataset has been used, covering one year from 01/26/2019 to 01/26/2020 at minute resolution. The chosen data set is that of the NREL BMS one-year data set with minute granularity, specifically, the Global CMP22 irradiance channel. Instances are examined using a window of 60 timesteps each, in addition to two inputs to the model (irradiance and its derivative).
 
-In our design, the chosen dataset is the NREL BMS one-year minute-resolution stream that concentrates on the Global CMP22 irradiance channel. Here, each instance is considered as part of a sliding window of size 60 timesteps, along with two model inputs (irradiance and its derivative).
+
+Table~\ref{table:dataset_subset} shows a sample of ten instances in the entire data set to maintain readability in the thirteen columns of the latter. The complete dataset is used for the training and evaluation, while the table is included only to make the input fields visible at a glance.
 
 \begin{table*}[!t]
-\caption{Subset of the Dataset (All 13 Parameters, 10 Records)}
+\caption{Representative Subset of the Dataset Showing All 13 Parameters Across 10 Records}
 \label{table:dataset_subset}
 \centering
-\scriptsize
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|}
+\large
+{\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{2.5}
+\resizebox{1.05\textwidth}{!}{%
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|c|c|c|}
 \hline
-DATE (MM/DD/YYYY) & MST & Global CMP22 (vent/cor) [W/m$^2$] & Global CMP22-1 (cor) [W/m$^2$] & Global CMP22-2 (cor) [W/m$^2$] & Global CMP11 (cor) [W/m$^2$] & Global PSP (vent/cor) [W/m$^2$] & Global GPP (cor) [W/m$^2$] & Global Research 1 [W/m$^2$] & Global UVB-1 [W/m$^2$] & Global UV-S-B-T [W/m$^2$] & Global 90-West PSP [W/m$^2$] & Direct CUVB2 [W/m$^2$] \\
+\textbf{Sl. No.} & \textbf{DATE (MM/DD/YYYY)} & \textbf{MST} & \textbf{Global CMP22 (vent/cor) [W/m$^2$]} & \textbf{Global CMP22-1 (cor) [W/m$^2$]} & \textbf{Global CMP22-2 (cor) [W/m$^2$]} & \textbf{Global CMP11 (cor) [W/m$^2$]} & \textbf{Global PSP (vent/cor) [W/m$^2$]} & \textbf{Global GPP (cor) [W/m$^2$]} & \textbf{Global Research 1 [W/m$^2$]} & \textbf{Global UVB-1 [W/m$^2$]} & \textbf{Global UV-S-B-T [W/m$^2$]} & \textbf{Global 90-West PSP [W/m$^2$]} & \textbf{Direct CUVB2 [W/m$^2$]} \\
 \hline
-1/26/2019 & 07:16 & 3.97621 & 4.44060 & 4.27966 & 4.83216 & 8.42773 & 4.71733 & 5.19894 & -0.001 & 0 & 1.98487 & 0 \\
-1/26/2019 & 07:17 & 4.96652 & 5.46627 & 5.29066 & 5.97006 & 9.57426 & 5.95183 & 6.60461 & -0.001 & 0 & 2.64293 & 0 \\
-1/26/2019 & 07:18 & 5.75069 & 6.28833 & 6.13483 & 6.76291 & 10.3912 & 6.70633 & 7.65581 & -0.001 & 0 & 2.99068 & 0 \\
-1/26/2019 & 07:19 & 5.33213 & 5.86996 & 5.74418 & 6.39497 & 10.0815 & 6.28613 & 6.44981 & -0.001 & 0 & 3.01208 & 0 \\
-1/26/2019 & 07:20 & 5.08743 & 5.63157 & 5.4773 & 6.20357 & 10.1310 & 6.13155 & 5.68789 & -0.001 & 0.001 & 3.33309 & -0.001 \\
-1/26/2019 & 07:21 & 5.52233 & 6.09820 & 5.91677 & 6.68798 & 10.6972 & 6.60658 & 6.30313 & -0.001 & 0.001 & 3.83597 & 0 \\
-1/26/2019 & 07:22 & 6.23630 & 6.84322 & 6.67704 & 7.41612 & 11.4637 & 7.32754 & 7.47250 & 0 & 0.001 & 4.26931 & 0 \\
-1/26/2019 & 07:23 & 7.13014 & 7.77046 & 7.60138 & 8.30298 & 12.3309 & 8.21539 & 8.73559 & 0 & 0.002 & 4.72939 & -0.001 \\
-1/26/2019 & 07:24 & 8.33020 & 8.93881 & 8.80785 & 9.29760 & 13.3101 & 8.95392 & 9.37937 & 0 & 0.002 & 5.46233 & -0.001 \\
-1/26/2019 & 07:25 & 10.1807 & 10.7369 & 10.5025 & 10.4191 & 14.8374 & 9.94323 & 11.6366 & 0 & 0.002 & 7.24920 & 0 \\
+0 & 1/26/2019 & 07:16 & 3.97621 & 4.44060 & 4.27966 & 4.83216 & 8.42773 & 4.71733 & 5.19894 & $-$0.001 & 0 & 1.98487 & 0 \\
+1 & 1/26/2019 & 07:17 & 4.96652 & 5.46627 & 5.29066 & 5.97006 & 9.57426 & 5.95183 & 6.60461 & $-$0.001 & 0 & 2.64293 & 0 \\
+2 & 1/26/2019 & 07:18 & 5.75069 & 6.28833 & 6.13483 & 6.76291 & 10.3912 & 6.70633 & 7.65581 & $-$0.001 & 0 & 2.99068 & 0 \\
+3 & 1/26/2019 & 07:19 & 5.33213 & 5.86996 & 5.74418 & 6.39497 & 10.0815 & 6.28613 & 6.44981 & $-$0.001 & 0 & 3.01208 & 0 \\
+4 & 1/26/2019 & 07:20 & 5.08743 & 5.63157 & 5.4773 & 6.20357 & 10.1310 & 6.13155 & 5.68789 & $-$0.001 & 0.001 & 3.33309 & $-$0.001 \\
+5 & 1/26/2019 & 07:21 & 5.52233 & 6.09820 & 5.91677 & 6.68798 & 10.6972 & 6.60658 & 6.30313 & $-$0.001 & 0.001 & 3.83597 & 0 \\
+6 & 1/26/2019 & 07:22 & 6.23630 & 6.84322 & 6.67704 & 7.41612 & 11.4637 & 7.32754 & 7.47250 & 0 & 0.001 & 4.26931 & 0 \\
+7 & 1/26/2019 & 07:23 & 7.13014 & 7.77046 & 7.60138 & 8.30298 & 12.3309 & 8.21539 & 8.73559 & 0 & 0.002 & 4.72939 & $-$0.001 \\
+8 & 1/26/2019 & 07:24 & 8.33020 & 8.93881 & 8.80785 & 9.29760 & 13.3101 & 8.95392 & 9.37937 & 0 & 0.002 & 5.46233 & $-$0.001 \\
+9 & 1/26/2019 & 07:25 & 10.1807 & 10.7369 & 10.5025 & 10.4191 & 14.8374 & 9.94323 & 11.6366 & 0 & 0.002 & 7.24920 & 0 \\
 \hline
 \end{tabular}%
-}
+}}
 \end{table*}
 
-\textbf{Split Strategy:} Data is divided into 80\% train and 20\% test partitions with stratification across irradiance ranges.
-
-\textbf{Hardware:} Training is performed on an NVIDIA GPU, and inference timing is evaluated on a Raspberry Pi 4.
-
-\textbf{Implementation:} TensorFlow 2.x with Keras API (Python 3.8).
-
-\textbf{Evaluation Metrics:} Mean Absolute Error (MAE), mean bias, Prediction Error Ratio (PER), $R^2$, range coverage, and catastrophic failure count.
+Data is divided into 80\% train and 20\% test partitions with stratification across irradiance ranges. Training is performed on an NVIDIA GPU, and inference timing is evaluated on a Raspberry Pi 4. The implementation uses TensorFlow 2.x with Keras API (Python 3.8). The Evaluation metrics include Mean Absolute Error (MAE), mean bias, Prediction Error Ratio (PER), $R^2$, range coverage, and catastrophic failure count.
 
 \subsection{Iterative Model Development}
 Model development followed a three-iteration process, where each iteration addressed an observed failure mode from the previous stage.
 
 \subsubsection{Iteration 1: Baseline CNN}
-\textbf{Configuration:} Simple CNN without weighted loss or data augmentation
+The first iteration used a simple CNN without weighted loss or data augmentation. Training loss had converged from 0.95 to 0.005, and the validation loss from 0.5 to 0.005. Training MAE moved from 0.68 to 0.05, and the validation MAE moved from 0.45 to 0.02. Mean bias was $-7.78$~W/m$^2$, indicating under-prediction. A critical failure was observed: the model failed to predict very low irradiance values (below 30~W/m$^2$), with outputs saturating around 30~W/m$^2$. Range coverage was limited to roughly 0--200~W/m$^2$.
 
-\textbf{Results:}
-\begin{itemize}
-\item Train Loss: 0.95 $\rightarrow$ 0.005, Val Loss: 0.5 $\rightarrow$ 0.005
-\item Train MAE: 0.68 $\rightarrow$ 0.05, Val MAE: 0.45 $\rightarrow$ 0.02
-\item Mean Bias: $-7.78$~W/m$^2$ (under-predicting)
-\item \textbf{Critical Failure:} The model fails to predict very low irradiance values ($<$30~W/m$^2$), with outputs saturating around 30~W/m$^2$.
-\item Range Coverage:  The range of interest is roughly 0-200~W/m$^2$.
-\end{itemize}
-
-\textbf{Problem Identification:} The problem was an imbalance in classes, which led to insufficient training of the model in nighttime and very cloudy conditions. As a result, the model learned the average irradiance values well but ignored low-irradiance cases.
-
-\textbf{Fix:} Use a weighted loss function (with weight $2.0\times$ for $<$30~W/m$^2$) and apply $3\times$  oversampling and stratified sampling.
+The problem was identified as class imbalance, which led to insufficient training in nighttime and very cloudy conditions. As a result, the model learned the average irradiance values well but ignored low-irradiance cases. The fix applied was a weighted loss function (with weight $2.0\times$ for the values below 30~W/m$^2$), along with $3\times$ oversampling and stratified sampling.
 
 \subsubsection{Iteration 2: With Fixes}
-\textbf{Setting:} Use weighted loss (weight $2.0\times$), $3\times$ oversampling, and add Batch Normalization.
+The second iteration used the weighted loss (weight $2.0\times$), $3\times$ oversampling, and added batch normalization. Training loss had converged from 0.07 to 0.003 and the validation loss from 0.03 to 0.003. Training MAE moved from 0.105 to 0.032, and the validation MAE moved from 0.065 to 0.041. Mean bias was $+12.47$~W/m$^2$, indicating over-prediction. The range coverage expanded to 0--1200~W/m$^2$, which was a major improvement. Error spikes of $\pm400$~W/m$^2$ were observed during the sudden weather changes.
 
-\textbf{Results:}
-\begin{itemize}
-\item Train Loss: 0.07 $\rightarrow$ 0.003, Val Loss: 0.03 $\rightarrow$ 0.003
-\item Train MAE: 0.105 $\rightarrow$ 0.032, Val MAE: 0.065 $\rightarrow$ 0.041
-\item Bias: Mean bias $+12.47$~W/m$^2$ (bias is biased toward overprediction).
-\item Range Coverage: \textbf{0-1200~W/m$^2$} (MAJOR FIX—full range achieved)
-\item Error spikes: $\pm 400$~W/m$^2$ when there are sudden changes in the weather.
-\end{itemize}
-
-\textbf{Problem Analysis:} Improvements of the previous model were obvious. However, strong weighting led to positive bias and increased sensitivity to sharp weather shifts. Spikes occurred at transition stages.
-
-\textbf{Solution:} reduced weight to $2.0\times$ ,implemented adaptive smoothing of rapid transitions and bias correction of $-12.47$~W/m$^2$.
+Improvements over the previous model were obvious; however, strong weighting led to positive bias and increased sensitivity to sharp weather shifts, with spikes occurring at the transition stages. The solution applied was a reduced weight of $2.0\times$, adaptive smoothing of rapid transitions, and bias correction of $-12.47$~W/m$^2$.
 
 \subsubsection{Iteration 3: Final Model (Production Version)}
-\textbf{ Network Configuration:} Weight $2.0\times$, adaptive smoothing, symmetric loss function, bias correction
+The final iteration used a weight $2.0\times$, adaptive smoothing, a symmetric loss function, and bias correction. Training loss had converged from 0.021 to 0.0015, and the validation loss from 0.005 to 0.0023. Training MAE moved from 0.081 to 0.035, and the validation MAE moved from 0.051 to 0.051. Mean bias (predicted--actual) was $-8.39$~W/m$^2$, a 32.7\% magnitude reduction from Iteration 2. Range coverage of 0--1200~W/m$^2$ was maintained. Error distribution was centered but with a measurable residual skew in the high-irradiance regimes. A residual underprediction remains in aggregate. Catastrophic failures totaled 201 (cases where the absolute error exceeds the absolute actual value).
 
-\textbf{Results:}
-\begin{itemize}
-\item Train Loss: 0.021 $\rightarrow$ 0.0015, Val Loss: 0.005 $\rightarrow$ 0.0023
-\item Train MAE: 0.081 $\rightarrow$ 0.035, Val MAE: 0.051 $\rightarrow$ 0.051
-\item \textbf{Mean Bias (predicted-actual): $-8.39$~W/m$^2$} (32.7\% magnitude reduction from Iteration 2)
-\item Range Coverage: 0-1200~W/m$^2$ maintained for reporting
-\item Error Distribution: centered but with the measurable residual skew in the high-Irradiance regimes
-\item Systematic Drifts: The residual underprediction remains in aggregate.
-\item \textbf{Catastrophic Failures: 201} (cases where absolute error exceeds absolute actual value)
-\end{itemize}
-
-\textbf{Performance Summary:}
 \begin{table}[!htbp]
 \caption{Model Iteration Comparison}
 \label{table:iterations}
@@ -616,12 +399,12 @@ Model development followed a three-iteration process, where each iteration addre
 \hline
 \textbf{Metric} & \textbf{Iter 1} & \textbf{Iter 2} & \textbf{Iter 3} \\
 \hline
-Mean Bias (W/m$^2$) & $-7.78$ & $+12.47$ & \textbf{$-8.39$} \\
-Range Coverage (W/m$^2$) & 0-200 & 0-1200 & 0-1200 \\
+Mean Bias (W/m$^2$) & $-7.78$ & $+12.47$ & $-8.39$ \\
+Range Coverage (W/m$^2$) & 0--200 & 0--1200 & 0--1200 \\
 Low-value ($<$30) Support & No & Yes & Yes \\
-Error Distribution & Skewed & Gaussian & \textbf{Best Gaussian Fit} \\
-Catastrophic Fails & Many & Few & \textbf{201} \\
-Production Ready & No & Almost & \textbf{Needs extra calibration} \\
+Error Distribution & Skewed & Gaussian & Best Gaussian Fit \\
+Catastrophic Fails & Many & Few & 201 \\
+Production Ready & No & Almost & Needs extra calibration \\
 \hline
 \end{tabular}%
 }
@@ -636,7 +419,7 @@ Production Ready & No & Almost & \textbf{Needs extra calibration} \\
 \vspace{-8pt}
 
 \subsection{Comparison with various State-of-the-Art Methods}
-Table~\ref{table:comparison} shows the comparison of the proposed model against selected statistical and ML-based approaches. Major takeaways are summarized as follows:
+Table~\ref{table:comparison} shows the comparison of the proposed model against selected statistical and ML-based approaches.
 
 \begin{table}[!htbp]
 \caption{Comprehensive Comparison with State-of-the-Art Methods}
@@ -650,23 +433,23 @@ Table~\ref{table:comparison} shows the comparison of the proposed model against 
 \hline
 \multicolumn{4}{|c|}{\textit{Traditional Statistical Methods}} \\
 \hline
-EWMA \cite{ref5} & Statistical & 5-15\% & 2017 \\
-WCMA \cite{ref6} & Statistical & 10-20\% & 2019 \\
-Pro-Energy \cite{ref7} & Pattern Match & 7-25\% & 2020 \\
-Mod Pro-Energy \cite{ref8} & Pattern+Error & 11-29\% & 2023 \\
+EWMA \cite{ref5} & Statistical & 5--15\% & 2017 \\
+WCMA \cite{ref6} & Statistical & 10--20\% & 2019 \\
+Pro-Energy \cite{ref7} & Pattern Match & 7--25\% & 2020 \\
+Mod Pro-Energy \cite{ref8} & Pattern+Error & 11--29\% & 2023 \\
 \hline
 \multicolumn{4}{|c|}{\textit{Machine Learning / Autoregressive Methods}} \\
 \hline
 EENA (NARNET) \cite{ref12} & ML (NARNET) & 99.62\%$^*$ & 2024 \\
-PADC-MAC (NARNET) \cite{ref11} & ML (NARNET) & 71-89\%$^\dagger$ & 2023 \\
+PADC-MAC (NARNET) \cite{ref11} & ML (NARNET) & 71--89\%$^\dagger$ & 2023 \\
 \hline
-\multicolumn{4}{|c|}{\textit{Deep Learning (CNN) - Our Work}} \\
+\multicolumn{4}{|c|}{\textit{Deep Learning (CNN) -- Our Work}} \\
 \hline
-\textbf{Our CNN Model} & \textbf{Deep Learning} & \textbf{77.93\% (100-MAPE)} & \textbf{2026} \\
+Our CNN Model & Deep Learning & 77.93\% (100-MAPE) & 2026 \\
 \hline
 \multicolumn{4}{|p{0.95\columnwidth}|}{$^*$EENA: Limited evaluation scope, may not generalize.} \\
-\multicolumn{4}{|p{0.95\columnwidth}|}{$^\dagger$PADC-MAC: 88-89\% (high irradiance), 71-72\% (low irradiance).} \\
-\multicolumn{4}{|p{0.95\columnwidth}|}{\textbf{Our result here is reported as 100-MAPE (irradiance $>10$~W/m$^2$) for reproducibility with project code.}} \\
+\multicolumn{4}{|p{0.95\columnwidth}|}{$^\dagger$PADC-MAC: 88--89\% (high irradiance), 71--72\% (low irradiance).} \\
+\multicolumn{4}{|p{0.95\columnwidth}|}{Our result here is reported as 100-MAPE (irradiance $>10$~W/m$^2$) for reproducibility with project code.} \\
 \hline
 \end{tabular}%
 }
@@ -679,20 +462,14 @@ PADC-MAC (NARNET) \cite{ref11} & ML (NARNET) & 71-89\%$^\dagger$ & 2023 \\
 \label{fig:comprehensive_comparison}
 \end{figure}
 
-\textbf{Key Observations:}
-\begin{itemize}
-\item The proposed model shows significantly better and more consistent performance compared to traditional approaches.
-\item On this repository split, MAPE for the Irradiance $>10$~W/m$^2$ is 22.07\% (thus 100-MAPE = 77.93\%).
-\item In contrast to PADC-MAC NARNET, the proposed approach has less variance in the range of low- and high-irradiance values.
-\item Full-range operability of the model was demonstrated, but catastrophic errors are not zero and need mitigation.
-\end{itemize}
+The proposed model shows significantly better and more consistent performance compared to traditional approaches. On this repository split, MAPE for the irradiance above 10~W/m$^2$ is 22.07\% (thus 100-MAPE = 77.93\%). In contrast to PADC-MAC NARNET, the proposed approach has less variance in the range of low- and high-irradiance values. Full-range operability of the model was demonstrated, but catastrophic errors are not zero and need mitigation.
 
 \FloatBarrier
 
 \subsection{Detailed Model Performance Evaluation}
 
 \subsubsection{Performance per Range}
- Error statistics are shown for each operating range to analyze consistency across regimes.
+Error statistics are shown for each operating range to analyze consistency across regimes.
 
 \begin{table}[!htbp]
 \caption{Performance by Irradiance Range}
@@ -704,15 +481,15 @@ PADC-MAC (NARNET) \cite{ref11} & ML (NARNET) & 71-89\%$^\dagger$ & 2023 \\
 \hline
 \textbf{Range (W/m$^2$)} & \textbf{MAE} & \textbf{Bias} & \textbf{Samples} \\
 \hline
-0-30 (Nighttime) & 8.23 & $-8.19$ & 5982 \\
-30-100 (Low Light) & 35.16 & $-29.18$ & 6288 \\
-100-500 (Typical) & 31.19 & $+20.57$ & 23710 \\
+0--30 (Nighttime) & 8.23 & $-8.19$ & 5982 \\
+30--100 (Low Light) & 35.16 & $-29.18$ & 6288 \\
+100--500 (Typical) & 31.19 & $+20.57$ & 23710 \\
 500+ (Peak) & 53.89 & $-40.65$ & 17262 \\
 \hline
-\textbf{Overall} & \textbf{36.44} & \textbf{$-8.39$} & \textbf{53242} \\
+Overall & 36.44 & $-8.39$ & 53242 \\
 \hline
-\multicolumn{4}{|l|}{\textbf{Variance across ranges: 8.23-53.89 (6.55$\times$)}} \\
-\multicolumn{4}{|l|}{\textbf{vs PADC-MAC variance: 71-89\% (1.25$\times$ but lower baseline)}} \\
+\multicolumn{4}{|l|}{Variance across ranges: 8.23--53.89 (6.55$\times$)} \\
+\multicolumn{4}{|l|}{vs PADC-MAC variance: 71--89\% (1.25$\times$ but lower baseline)} \\
 \hline
 \end{tabular}%
 }
@@ -725,16 +502,10 @@ PADC-MAC (NARNET) \cite{ref11} & ML (NARNET) & 71-89\%$^\dagger$ & 2023 \\
 \label{fig:per_range_performance}
 \end{figure}
 
-\textbf{Findings:}
-\begin{itemize}
-\item Nighttime performance remains strong, while the low-light and peak segments still carry larger regime-specific error.
-\item Bias is not uniform across ranges ($-40.65$ to $+20.57$~W/m$^2$), indicating the residual regime-dependent drift.
-\item MAE rises in the highest Irradiance regime, indicating room for further calibration.
-\item Final model stays fully functional across all analyzed ranges (0 to 1200~W/m$^2$).
-\end{itemize}
+Nighttime performance remains strong, while the low-light and peak segments still carry larger regime-specific error. Bias is not uniform across ranges ($-40.65$ to $+20.57$~W/m$^2$), indicating the residual regime-dependent drift. MAE rises in the highest irradiance regime, indicating room for further calibration. The final model stays fully functional across all analyzed ranges (0 to 1200~W/m$^2$).
 
 \subsubsection{Ablation Study}
-Quantification of individual components' contribution is provided in Table~\ref{table:ablation}. 
+Quantification of individual components' contribution is provided in Table~\ref{table:ablation}.
 
 \begin{table}[!htbp]
 \caption{Ablation Study Results}
@@ -750,9 +521,9 @@ Baseline CNN only & 52.3 & $-7.78$ \\
 + Weighted Loss & 41.2 & $+12.47$ \\
 + Data Augmentation & 38.7 & $+8.34$ \\
 + Batch Normalization & 36.1 & $+6.98$ \\
-\textbf{+ All (Final Model)} & \textbf{36.44} & \textbf{$-8.39$} \\
++ All (Final Model) & 36.44 & $-8.39$ \\
 \hline
-\multicolumn{3}{|l|}{\textbf{Total improvement: 15.86 W/m$^2$ (30.3\% reduction)}} \\
+\multicolumn{3}{|l|}{Total improvement: 15.86 W/m$^2$ (30.3\% reduction)} \\
 \hline
 \end{tabular}%
 }
@@ -765,18 +536,12 @@ Baseline CNN only & 52.3 & $-7.78$ \\
 \label{fig:ablation_study}
 \end{figure}
 
-The ablation trend is clear and consistent:
-\begin{itemize}
-\item \textbf{Weighted loss:} Largest single gain (11.1~W/m$^2$ MAE reduction) – mainly due to fixing the low-light bias.
-\item \textbf{Data augmentation:}  Increases performance by 2.5~W/m$^2$ through enhanced tolerance to lighting variability.
-\item \textbf{Batch normalization:} Increases performance by 3.7~W/m$^2$ thanks to improved optimization convergence.
-\item \textbf{Reproducibility check:} Saved-model held-out the evaluation reports MAE of 36.44~W/m$^2$ and the bias of $-8.39$~W/m$^2$.
-\end{itemize}
+The ablation trend is clear and consistent. Weighted loss provides the largest single gain of 11.1~W/m$^2$ MAE reduction, mainly due to fixing the low-light bias. The Data augmentation increases performance by 2.5~W/m$^2$ through enhanced tolerance to lighting variability. The Batch normalization increases performance by 3.7~W/m$^2$ through improved optimization convergence. A reproducibility check on the saved-model held-out evaluation reports MAE of 36.44~W/m$^2$ and bias of $-8.39$~W/m$^2$.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\columnwidth]{predicted_vs_actual.png}
-\caption{Predicted VS Actual Irradiance analysis.}
+\caption{Predicted vs. Actual Irradiance analysis.}
 \label{fig:predicted_vs_actual}
 \end{figure}
 
@@ -789,127 +554,41 @@ The ablation trend is clear and consistent:
 
 \FloatBarrier
 
-% Discussion
-\section{Discussion}
+\subsection{Discussion}
 
 \subsection{Why CNN Outperforms Autoregressive Approaches}
 
-Comparing with autoregressive models like NARNET\cite{ref11, ref12}, the proposed CNN-based pipeline demonstrates better consistency for a very good reason – while autoregressive models use recent past values (I(t − n) for n = 1, 2,...) to predict I(t), the proposed one relies on current visual input instead. This property is especially valuable for cases of low light and fast cloud transitions.
+Comparing with autoregressive models like NARNET \cite{ref11, ref12}, the proposed CNN-based pipeline demonstrates better consistency for a very good reason -- while autoregressive models use recent past values ($I(t-n)$ for $n = 1, 2, \ldots$) to predict $I(t)$, the proposed one relies on current visual input instead. This property is especially valuable for cases of low light and fast cloud transitions.
 
-\subsubsection{Visual Feature Learning vs  Autoregression}
- Autoregressive models leverage sequences such as $[I(t-24), I(t-23), \ldots, I(t-1)]$ to predict $I(t)$.Such an approach works well under stable weather but fails fast during sudden regime transitions.
-\begin{itemize}
-\item Fast cloud transitions affect irradiance much quicker than its recent history captures.
-\item Low-irradiance regimes produce long flat sequences with poor predictive patterns.
-\item Atypical meteorological events may be absent from the training experience altogether.
-\end{itemize}
-
-In contrast, the CNN can exploit spatial features visible at time $t$, such as:
-\begin{itemize}
-\item Cloud cover and texture.
-\item Brightness gradients across panels or scenes.
-\item Shadows caused by local obstructions.
-\item Surface artifacts affecting the effective irradiance.
-\end{itemize}
-
-These features are implicit in scalar autoregressive representations, allowing some explanation of improved performance during cross-conditioning.
+\subsubsection{Visual Feature Learning vs Autoregression}
+Autoregressive models leverage sequences such as $[I(t-24), I(t-23), \ldots, I(t-1)]$ to predict $I(t)$. Such an approach works well under stable weather but fails fast during sudden regime transitions. Fast cloud transitions affect the irradiance much more quickly than the recent history captures. Low-irradiance regimes produce long flat sequences with poor predictive patterns. A typical meteorological event may be absent from the training experience altogether. In contrast, the CNN can exploit spatial features visible at time $t$, such as cloud cover and texture, brightness gradients across panels or scenes, shadows caused by local obstructions, and surface artifacts affecting the effective irradiance. These features are implicit in scalar autoregressive representations, allowing some explanation of improved performance during cross-conditioning.
 
 \subsubsection{Automatic Feature Engineering}
-The ability to learn features also constitutes a practical advantage. Classical and autoregressive models generally rely on:
-\begin{itemize}
-\item Manually chosen lag-window size.
-\item Tuned depths and dimensions of networks.
-\item Explicit categories or rules of the weather patterns.
-\item Profile similarity measures.
-\end{itemize}
-
-While the CNN itself requires architecture choices, it derives most information from backpropagation, minimizing manual feature engineering effort.
+The ability to learn features also constitutes a practical advantage. Classical and autoregressive models generally rely on manually chosen lag-window size, tuned depths and dimensions of networks, explicit categories or rules of weather patterns, and the profile similarity measures. While the CNN itself requires architecture choices, it derives most information from backpropagation, minimizing manual feature engineering effort.
 
 \subsubsection{Resilience Against Outliers and Transition}
-The management of outliers will be more successful with low-light focused training and augmentation, which helped mitigate spike events and avoid failure in the experimental test set.
-
-\subsubsection{Coping With Sudden Changes in the Weather}
-Qualitatively, the second iteration still suffered sudden changes producing spikes up to $\pm 400$~W/m$^2$; nevertheless, most errors disappeared in the last one, to within about $\pm 100$~W/m$^2$ (95\% interval). Such a behavior matches the one that can react according to the current condition rather than based on lagged irradiance history alone.
+The management of outliers is more successful with low-light focused training and augmentation, which helped mitigate spike events and avoid failure in the experimental test set. Qualitatively, the second iteration still suffered sudden changes producing spikes up to $\pm400$~W/m$^2$; nevertheless, most errors disappeared in the final model, to within about $\pm100$~W/m$^2$ (95\% interval). Such behavior matches one that reacts according to the current condition rather than based on lagged irradiance history alone.
 
 \subsection{Practical Deployment Considerations}
 
 \subsubsection{Hardware needs}
-\textbf{Edge Inference (Option 1):} Perform inference at the edge with devices such as Raspberry Pi 4 (2GB RAM), offering reasonable latency for minute-based prediction.
+Three deployment options are considered. Edge inference (Option 1) performs inference at the edge with devices such as Raspberry Pi 4 (2 GB RAM), offering reasonable latency for minute-based prediction. Cloud inference (Option 2) offloads inference to a remote server, providing greater flexibility, yet with communication dependency and increased latency. A hybrid approach (Option 3) deploys an INT8 model at the edge as the primary means of prediction, periodically retraining in the cloud whenever a connection is possible.
 
-\textbf{ Cloud Inference (Option 2):} Offload inference to a remote server, providing greater flexibility, yet with communication dependency and increased latency.
-
-\textbf{Hybrid approach (Option 3):} Deploy INT8 model at the edge as the primary means of prediction, periodically retraining in the cloud whenever a connection is possible.
-
-\subsubsection{Model quantization}
-INT8 quantization represents the best choice in terms of deployability for this application:
-\begin{itemize}
-\item The size of the stored model in this repository is around 0.12 MB.
-\item The measured inference time is about 53.55 ms per example under the current CPU setting.
-\item No data concerning the inference time of the INT8 quantized runtime and related decrease in accuracy are available in this release.
-\item The model can be considered light enough for edge deployment.
-\end{itemize}
+\subsubsection{Model Quantization}
+INT8 quantization represents the best choice in terms of deployability for this application. The size of the stored model in this repository is around 0.12~MB. The measured inference time is about 53.55~ms per example under the current CPU setting. No data concerning the inference time of the INT8 quantized runtime, and the related decrease in accuracy, are available in this release. The model can be considered light enough for edge deployment.
 
 \subsubsection{Power Consumption Analysis}
-\begin{itemize}
-\item Camera capture: 0.5~W $\times$ 0.1~s = 0.00014~Wh
-\item Inference (measured): 2~W $\times$ 0.05355~s = 0.00003~Wh
-\item \textbf{Total per prediction: 0.00017~Wh}
-\item With 1-minute intervals: 0.245~Wh/day
-\item Harvested energy per day (January 26, 2019): 169.93~Wh
-\item \textbf{Overhead energy: 0.14\%} of the daily harvest (negligible)
-\end{itemize}
-
-The above numbers clearly show that the cost of prediction is small in comparison with the energy collected during the day; therefore, continuous deployment becomes feasible.
+The power-consumption estimate combines the camera capture and the inference. Camera capture consumes about 0.5~W for 0.1~s, which corresponds to 0.00014~Wh, and the inference consumes about 2~W for 0.05355~s, which corresponds to 0.00003~Wh. The total cost per prediction is therefore 0.00017~Wh. With 1-minute prediction intervals, the daily overhead becomes 0.245~Wh/day, while the harvested energy per day on January 26, 2019, is 169.93~Wh. As a result, the overhead energy is only 0.14\% of the daily harvest, which is negligible and supports continuous deployment.
 
 \subsection{Comparison with Recent Machine Learning Approaches}
 
 \subsubsection{PADC-MAC NARNET Analysis}
-Sarang et al. \cite{ref11}provide results where high-irradiance performance is good, comparable to the best-case scenarios we obtained. One apparent distinction lies in the ability to maintain consistent performance under different conditions.
+Sarang et al. \cite{ref11} provide results where high-irradiance performance is good, comparable to the best-case scenarios obtained in this work. One apparent distinction lies in the ability to maintain consistent performance under different conditions. PADC-MAC achieves 88--89\% accuracy under high irradiance but drops to 71--72\% under low irradiance, a clear condition-dependent difference. The proposed CNN achieves 77.93\% effective accuracy (100-MAPE) under the evaluation protocol used here. In terms of the error metrics, MAE for PADC-MAC is reported as a percentage (11.75\% high irradiance, 28.46\% low irradiance), while MAE for the proposed model is an absolute value of 36.44~W/m$^2$ on the held-out split.
 
-\textbf{Performance consistency:}
-\begin{itemize}
-\item PADC-MAC: 88-89\% (high) to 71-72\% (low), a clear condition-dependent difference is evident here.
-\item Proposed CNN (this repository split): 77.93\% effective accuracy (100-MAPE) under the evaluation protocol used here.
-\end{itemize}
-
-\textbf{Error metrics:}
-\begin{itemize}
-\item MAE for PADC-MAC: percentages (11.75\% high irradiance, 28.46\% low irradiance).
-\item  MAE for our model: Absolute value of 36.44~W/m$^2$ on the held-out split.
-\end{itemize}
-
-\textbf{Reasons for better generalization in our model:}
-\begin{enumerate}
-\item Visual properties carry useful information even in the absence of high-irradiance (cloud cover, ground state). Historical data becomes meaningless during prolonged periods of low irradiance.
-\item Using a weighted loss function, more attention is paid to low-irradiance conditions (2$\times$ times more important if $<$30~W/m$^2$)
-\item Low-irradiance conditions generated in the data-augmentation process.
-\end{enumerate}
+Better generalization in the proposed model is attributed to three factors. Visual properties carry useful information even in the absence of high irradiance (cloud cover, ground state), whereas historical data becomes less informative during prolonged periods of low irradiance. The weighted loss function pays more attention to low-irradiance conditions ($2\times$ weight for the values below 30~W/m$^2$). Additionally, low-irradiance conditions are explicitly generated during the data-augmentation process.
 
 \subsubsection{EENA NARNET Analysis}
-Bhuvaneswari et al. \cite{ref12} obtain 99.62\% accuracy, numerically exceeding our best performance figures. However, direct comparisons are difficult due to differences in methodology used.
-
-\textbf{Limited evaluation scope:}
-\begin{itemize}
-\item Tested only on "sunny" and "cloudy" days—no nighttime validation
-\item No range coverage evidence (0-1200~W/m$^2$ verification absent)
-\item Conference publication (lower peer review rigor)
-\end{itemize}
-
-\textbf{Overfitting indicators:}
-\begin{itemize}
-\item 99.62\% accuracy is suspiciously high for real-world solar prediction
-\item No catastrophic failure analysis (in our measured setup, the catastrophic failures are explicitly counted as 201)
-\item No performance degradation at varying irradiance levels (as demonstrated by our Table~\ref{table:range})
-\end{itemize}
-
-\textbf{Reproducibility concerns:}
-\begin{itemize}
-\item Insufficient information about methodology
-\item Lack of a clear train/test split methodology may lead to data leakage issues
-\item Lack of validation with diverse weather patterns
-\end{itemize}
-
-Our evaluation focuses on coverage, robustness to edge cases, and practical performance metrics, which allow us to evaluate the results not only by means of aggregated accuracy.
+Bhuvaneswari et al. \cite{ref12} obtain 99.62\% accuracy, numerically exceeding our best performance figures. However, direct comparisons are difficult due to differences in methodology. The evaluation was tested only on sunny and cloudy days, with no nighttime validation. No range coverage evidence for the 0--1200~W/m$^2$ interval is provided, and the work appeared at a conference venue with lower peer review rigor. The 99.62\% accuracy is unusually high for real-world solar prediction, and no catastrophic failure analysis is provided -- in the measured setup here, catastrophic failures are explicitly counted as 201. No performance degradation at varying irradiance levels, as demonstrated in Table~\ref{table:range}, was reported by the authors. Insufficient information about methodology is given, and the lack of a clear train/test split methodology may introduce data leakage. The evaluation approach here focuses on coverage, robustness to edge cases, and practical performance metrics, which allow the results to be evaluated beyond aggregated accuracy alone.
 
 \subsection{Advantages Summary: CNN vs Autoregressive}
 
@@ -923,25 +602,25 @@ Our evaluation focuses on coverage, robustness to edge cases, and practical perf
 \hline
 \textbf{Aspect} & \textbf{NARNET} & \textbf{Mod Pro-Energy} & \textbf{Our CNN} \\
 \hline
-\textbf{Input Type} & Time-series & Time-series & Time-series (2 features) \\
+Input Type & Time-series & Time-series & Time-series (2 features) \\
 \hline
-\textbf{Feature Source} & Temporal patterns & Pattern matching + correction & Temporal + derivative patterns \\
+Feature Source & Temporal patterns & Pattern matching + correction & Temporal + derivative patterns \\
 \hline
-\textbf{Accuracy Range} & 71-89\% & 11-29\% & \textbf{77.93\% (100-MAPE)} \\
+Accuracy Range & 71--89\% & 11--29\% & 77.93\% (100-MAPE) \\
 \hline
-\textbf{Consistency} & Variable & Variable & \textbf{Stable} \\
+Consistency & Variable & Variable & Stable \\
 \hline
-\textbf{Low-light} & 71-72\% & Weak support & \textbf{MAE 8.23 W/m$^2$ (0-30 range)} \\
+Low-light & 71--72\% & Weak support & MAE 8.23~W/m$^2$ (0--30 range) \\
 \hline
-\textbf{Error Metric} & PER: 11.75-28.46\% & PER: 0.71-2.09 & MAE: \textbf{36.44 W/m$^2$} \\
+Error Metric & PER: 11.75--28.46\% & PER: 0.71--2.09 & MAE: 36.44~W/m$^2$ \\
 \hline
-\textbf{Rapid transitions} & Struggles & Struggles & \textbf{Robust} \\
+Rapid transitions & Struggles & Struggles & Robust \\
 \hline
-\textbf{Feature engineering} & Manual & Manual & \textbf{Automatic} \\
+Feature engineering & Manual & Manual & Automatic \\
 \hline
-\textbf{Edge cases} & Degradation & Degradation & \textbf{201 catastrophic fails (current eval)} \\
+Edge cases & Degradation & Degradation & 201 catastrophic fails (current eval) \\
 \hline
-\textbf{Inference time} & ~50ms & Low compute & \textbf{53.55ms} (measured CPU) \\
+Inference time & $\sim$50~ms & Low compute & 53.55~ms (measured CPU) \\
 \hline
 \end{tabular}%
 }
@@ -950,58 +629,24 @@ Our evaluation focuses on coverage, robustness to edge cases, and practical perf
 \subsection{Limitations and Future Work}
 
 \subsubsection{Current Limitations}
-\begin{enumerate}
-\item \textbf{ Imaging Device:}Use of an imaging sensor increases the cost and complexity of hardware integration.
-\item \textbf{New Site Labeled Data:} For optimal performance, it is required to have labeled data for new deployment sites.
-\item \textbf{Shorter Temporal Sequence Awareness:} The current implementation uses only the present moment to make predictions.
-\item \textbf{Short-Horizon Prediction Focus:} At this point, the pipeline is limited to short-horizon forecasting.
-\item \textbf{Nighttime Performance Limitation:} While nighttime performance is good, improvements are possible.
-\end{enumerate}
+The current version has five limitations. First, the use of an imaging sensor increases the hardware cost and integration complexity. Second, optimal performance on new deployment sites requires labeled data for that location. Third, the current implementation uses only the present moment for predictions, lacking the shorter temporal sequence awareness. Fourth, the pipeline is currently limited to short-horizon forecasting. Fifth, while nighttime performance is good, further improvements remain possible.
 
 \subsubsection{Future Enhancements}
-\begin{enumerate}
-\item \textbf{CNN-LSTM Combination:} Extend the current framework to include sequential awareness.
-
-\item \textbf{Visual \& Sensor Features Fusion:} Incorporate visual features and numerical sensor data (wind speed, temperature, etc.) via a multi-modality fusion algorithm:
+Seven enhancements are identified for future work. Extending the framework to a CNN-LSTM combination would add sequential awareness. Incorporating both visual features and numerical sensor data, such as wind speed and temperature, via a multi-modal fusion algorithm,
 \begin{equation}
 \hat{I}(t) = f_{fusion}(CNN(V_t), MLP(S_t))
 \end{equation}
-where $V_t$ denotes the visual modality and $S_t$ denotes sensor features.
-
-\item \textbf{Transfer Learning:} Perform pre-training at several sites followed by local fine-tuning with reduced data requirements
-
-\item \textbf{Uncertainty Estimation:} See  \cite{ref13} to provide support for risk-aware control algorithms.
+where $V_t$ denotes the visual modality and $S_t$ denotes sensor features, would further improve accuracy. Transfer learning through pre-training at multiple sites followed by local fine-tuning would reduce the data requirements for new deployments. Uncertainty estimation using the approach in \cite{ref13},
 \begin{equation}
 \text{Var}[\hat{I}] \approx \frac{1}{T}\sum_{i=1}^{T} (\hat{I}_i - \bar{\hat{I}})^2
 \end{equation}
-to support risk-aware control decisions.
+This would support risk-aware control decisions. Federated learning would facilitate collaborative learning without requiring centralized data access. Adding spatial attention mechanisms would improve model interpretability. Finally, extending the output to multiple steps ahead, $[\hat{I}(t+1), \hat{I}(t+2), \ldots, \hat{I}(t+H)]$, would enable the longer-horizon scheduling.
 
-\item \textbf{Federated Learning:} Facilitate collaborative learning without requiring centralized access to data.
-
-\item \textbf{Attention Models:} Add spatial attention mechanisms to improve interpretability.
-
-\item \textbf{Multi-Step Ahead Prediction:} Extend the output to $[\hat{I}(t+1), \hat{I}(t+2), \ldots, \hat{I}(t+H)]$ for longer-horizon scheduling.
-\end{enumerate}
-
-\subsection{Broader Impact}
-While our work concerns WSN operation specifically, the same formulation is equally applicable to a wide range of tasks where local renewable resource estimation is required for control, such as:
-\begin{itemize}
-\item \textbf{Smart grid solar forecasting:} Renewable integration into a distribution grid
-\item \textbf{Agricultural IoT:}  Precision agriculture with adaptive irrigation
-\item \textbf{Building Energy Management System:}HVAC pre-cooling based on sunlight estimates
-\item \textbf{Electric Vehicle Charging Station:} Solar-powered charging station with power balance
-\item \textbf{Autonomous Drones:} Solar-powered autonomous vehicles with visual navigation capabilities
-\item \textbf{Space application:} Mars rovers and satellites capable of estimating local solar irradiance via image analysis
-\end{itemize}
-
-In general, the main discovery made in the paper is related to the fact that visual context may improve performance in weather-dependent prediction problems compared to temporal history alone.
-
-% Conclusion
 \section{Conclusion}
-This paper describes a CNN-based architecture to predict irradiation levels suitable for use within solar power-enabled WSNs and examines the effectiveness of such an approach, considering two criteria – predictive performance and operational readiness for deployment in edge environments. Under the held-out evaluation protocol in this repository, the model achieves 77.93\% effective accuracy (100-MAPE for irradiance $>10$~W/m$^2$), MAE of 36.44~W/m$^2$, and the mean bias (predicted-actual) of $-8.39$~W/m$^2$. These results show that machine learning on temporal irradiance features can provide useful predictive behavior for practical IoT scheduling.
+This paper describes a CNN-based architecture to predict irradiation levels suitable for use within solar power-enabled WSNs and examines the effectiveness of such an approach, considering two criteria -- predictive performance and operational readiness for deployment in edge environments. Under the held-out evaluation protocol in this repository, the model achieves 77.93\% effective accuracy (100-MAPE for irradiance above 10~W/m$^2$), MAE of 36.44~W/m$^2$, and the mean bias (predicted--actual) of $-8.39$~W/m$^2$. These results show that machine learning on temporal irradiance features can provide useful predictive behavior for practical IoT scheduling.
 
-The major takeaway message from the research conducted was the idea that the model improvement required multiple stages of engineering tuning rather than a singular architectural change: weighted loss improved the low-light behavior, and the calibration reduced but did not fully remove systematic bias. The current reproducible run still shows non-zero catastrophic errors, so additional calibration and regime-aware handling remain necessary in future steps. Even so, measured inference time (53.55 ms per sample on CPU) and the low daily overhead relative to harvested energy indicate that the deployment feasibility remains strong.
-% References
+The major takeaway message from the research conducted was the idea that the model improvement required multiple stages of engineering tuning rather than a singular architectural change: weighted loss improved the low-light behavior, and the calibration reduced but did not fully remove systematic bias. The current reproducible run still shows non-zero catastrophic errors, so additional calibration and regime-aware handling remain necessary in future steps. Even so, measured inference time (53.55~ms per sample on CPU) and the low daily overhead relative to harvested energy indicate that the deployment feasibility remains strong.
+
 \balance
 \begin{thebibliography}{99}
 
@@ -1012,7 +657,7 @@ M. Ali Jamshed, K. Ali, Q. H. Abbasi, M. A. Imran, and M. Ur-Rehman, ``Challenge
 A. Hazra, P. K. Donta, T. Amgoth, and S. Dustdar, ``Cooperative transmission scheduling and computation offloading with collaboration of fog and cloud for industrial IoT applications,'' \textit{IEEE Internet Things J.}, early access, 2022.
 
 \bibitem{ref3}
-D. K. Sah and T. Amgoth, ``Renewable energy harvesting schemes in wireless sensor networks: A survey,'' \textit{Inf. Fusion}, vol. 63, pp. 223--247, Nov. 2020.
+D. K. Sah and T. Amgoth, ``Renewable energy harvesting schemes in wireless sensor networks: A survey,'' \textit {Inf. Fusion}, vol. 63, pp. 223--247, Nov. 2020.
 
 \bibitem{ref4}
 A. Kansal, J. Hsu, S. Zahedi, and M. B. Srivastava, ``Power management in energy harvesting sensor networks,'' \textit{ACM Trans. Embedded Comput. Syst.}, vol. 6, no. 4, p. 32, Sep. 2007.
@@ -1046,9 +691,8 @@ Y. Gal and Z. Ghahramani, ``Dropout as a Bayesian approximation: Representing mo
 
 \end{thebibliography}
 
-% Biography
 \begin{IEEEbiography}{E Jayanth}
-E. Jayanth is pursuing the B.Tech degree in Computer Science and Engineering at the Indian Institute of Information Technology, SriCity, India. 
+E. Jayanth is pursuing the B.Tech degree in Computer Science and Engineering at the Indian Institute of Information Technology, SriCity, India.
 \end{IEEEbiography}
 
 \end{document}
