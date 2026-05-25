@@ -1,0 +1,15 @@
+# LaTeX paper source and build artifacts
+*.tex
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.pdf
+*.synctex.gz
+*.toc
+*.fls
+*.fdb_latexmk
+
+# Assignment / paper notes
+z4689499.txt
